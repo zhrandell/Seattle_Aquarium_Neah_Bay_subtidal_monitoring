@@ -1,0 +1,180 @@
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## Seattle Aquarium long-term rockfish monitoring around Neah Bay, Washington  
+## multivariate analyses community structure
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+
+## startup ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+rm(list = ls())
+
+library(tidyverse)
+library(vegan)
+
+## set your paths in a project folder 
+input <- "D:/OneDrive/Active_Projects/Neah_Bay/data_input"
+output <- "D:/OneDrive/Active_Projects/Neah_Bay/data_output"
+code <- "D:/OneDrive/Active_Projects/Neah_Bay/code" 
+fig <- "D:/OneDrive/Active_Projects/Neah_Bay/figures"
+
+setwd(input)
+dat <- read.csv("Neah_Bay_data.csv")
+## END startp ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+
+## tidy up data ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## remove first column, Location 
+dat <- dat[-1]
+
+
+## removes "Site" from the Site column, leaving just the #
+dat$Site <- gsub("^.{0,5}", "", dat$Site)
+
+
+## removes empty characters (blanks spaces) from strings 
+dat$Site <- gsub(" ", "", dat$Site)
+
+
+## function to place the last column [, ncol] in the first column position i.e. [, 1]
+front.ofthe.line <- function(data){
+  num.col <- ncol(data)
+  data <- data[c(num.col, 1:num.col-1)]
+  return(data)
+}
+
+
+## create unique identifier for each combination of site / transect 
+## (as all sites have T1, T2, etc.)
+create.key <- function(data){
+  data$Key <- data$Site
+  data$Key <- with(data, paste0(Key, Transect))
+  data <- front.ofthe.line(data)
+  return(data)
+}
+
+
+## remove the "19" and "20" from year dates for easier visualization, e.g., "1991" --> "91" 
+short.date <- function(data){
+  data$short.date <- gsub("20","", as.character(data$Year))
+  data <- front.ofthe.line(data)
+  return(data)
+}
+
+
+## create unique identifyer for data w/ multiple transects
+dat <- create.key(dat)
+
+
+## create a shorter year identifier, e.g., "10" instead of "2010"
+dat <- short.date(dat)
+## END data tidying ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+
+## select desired data ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## select either the Forward or Reverse data
+## the data default to BOTH ... if you want both directions, don't run this function
+select_direction <- function(x){
+  out <- filter(dat, Direction %in% c(x))
+  return(out)
+}
+
+
+## select the transects you desire to analyze
+## the data default to ALL, i.e., T1, T2, T3, T4
+select_transect <- function(x){
+  out <- filter(dat, Transect %in% c(x))
+}
+
+
+## to select only Forward data = enter F
+## to select only Reverse data = enter R 
+## to select BOTH Forward and Reverse data ... don't run this function
+dat <- select_direction("F")
+
+
+## enter whatever combination of "T1", "T2", "T3", "T4" is desired
+dat <- select_transect(c("T1"))
+## END data selection ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+
+## prep for NMDS analysis, transformations ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ncol_metadata <- 6
+info <- dat[,1:ncol_metadata]
+spp <- dat[,-(1:ncol_metadata)]
+
+
+log_transform <- function(x){
+  out <- log10(x+1)
+  return(out)
+}
+
+
+## run, if desired
+#comm <- log_transform(spp)
+## END NMDS prep ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+
+## perform multivariate analysis ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ord <- metaMDS(comm = spp, distance="bray", k=2, min = 1000, trymax=2000, 
+               autotransform = F, wascores = TRUE)
+
+
+## save a new ordination 
+setwd(output)
+save(ord, file = "ord.rda")
+
+
+## work with ordination: stress, NMDS coords 
+setwd(output)
+load("ord.rda")
+
+
+## visualize stress, check ordination, xy coordinates 
+## open graphics window
+graphics.off()
+windows(6,6,record=T)
+
+
+## plot
+plot(ord)
+stressplot(ord)
+
+
+## NMDS ordination coordinates saved as data frame
+save.coords <- function(ord, info, spp){
+  t1 <- as.data.frame(scores(ord))
+  t2 <- cbind(t1, info, spp)
+  return(t2)
+}
+
+
+## bind nmds coordinates to dataframe with site info and spp counts
+coords <- save.coords(ord, info, spp)
+
+
+## save final output as CSV files for further analysis / visualization  ~~~~~~~~
+setwd(output)
+write.csv(coords,'coords.csv')
+## END save / load of final CSV output ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## END of script ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
