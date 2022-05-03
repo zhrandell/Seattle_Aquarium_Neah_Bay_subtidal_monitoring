@@ -109,19 +109,32 @@ dat <- select_transect(c("T1"))
 
 
 ## prep for NMDS analysis, transformations ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## create separate metadata and spp dataframes 
 ncol_metadata <- 6
 info <- dat[,1:ncol_metadata]
 spp <- dat[,-(1:ncol_metadata)]
 
 
+
+## check and see if any species have 0 observations
+colSums(spp)
+
+## remove columns with 0 observations
+spp <- spp %>% select_if(negate(function(col) is.numeric(col) && sum(col) ==0))
+
+## recheck to confirm columns were deleted
+colSums(spp)
+
+
+
+## perform log_transform, if desired
 log_transform <- function(x){
   out <- log10(x+1)
   return(out)
 }
 
-
 ## run, if desired
-#comm <- log_transform(spp)
+spp <- log_transform(spp)
 ## END NMDS prep ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -154,6 +167,19 @@ plot(ord)
 stressplot(ord)
 
 
+
+## overlay correlation with log species  
+dist <- ord$dist
+ord.points <- postMDS(ord$points, dist)
+spp_scores <- as.data.frame(wascores(ord.points, spp))     
+names(spp_scores)[1] <- "spp_x"
+names(spp_scores)[2] <- "spp_y"
+write.csv(spp_scores, "spp_scores.csv")
+
+
+
+
+
 ## NMDS ordination coordinates saved as data frame
 save.coords <- function(ord, info, spp){
   t1 <- as.data.frame(scores(ord))
@@ -163,12 +189,12 @@ save.coords <- function(ord, info, spp){
 
 
 ## bind nmds coordinates to dataframe with site info and spp counts
-coords <- save.coords(ord, info, spp)
+NMDS_coords <- save.coords(ord, info, spp)
 
 
 ## save final output as CSV files for further analysis / visualization  ~~~~~~~~
 setwd(output)
-write.csv(coords,'coords.csv')
+write.csv(NMDS_coords,'NMDS_coords.csv')
 ## END save / load of final CSV output ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
