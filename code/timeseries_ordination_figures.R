@@ -102,7 +102,7 @@ site.cols <- c(
 my.cols <- scale_color_manual(values=site.cols)
 txt.angle <- 45
 x.lab <- theme(axis.text.x = element_text(angle = txt.angle, hjust=1)) 
-x.breaks <- scale_x_continuous(breaks=seq(2005,2019,by=2))
+x.breaks <- scale_x_continuous(breaks=seq(2005,2019,by=1))
 no.leg <- theme(legend.position = "none")
 #no.x.title <- theme(axis.title.x = element_blank())
 #strip.text <- theme(strip.text.x = element_text(size=14))
@@ -225,7 +225,8 @@ windows(8, 5, record=T)
 
 plot.total.abun <- function(x){
   t1 <- ggplot(dat, aes(x=Year, y=total, group=Key, color=Key)) + my.theme + no.legend +
-    geom_point() + geom_path() + my.cols + ylab("Total (log10) abundance per site")
+    geom_point() + geom_path() + my.cols + ylab("Total (log10) abundance per site") +
+    x.lab + x.breaks
   return(t1)
 }
 
