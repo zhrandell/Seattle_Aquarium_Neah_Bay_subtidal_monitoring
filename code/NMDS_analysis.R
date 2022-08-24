@@ -14,13 +14,21 @@ library(tidyverse)
 library(vegan)
 
 ## set your paths in a project folder 
-input <- "D:/OneDrive/Active_Projects/Neah_Bay/data_input"
-output <- "D:/OneDrive/Active_Projects/Neah_Bay/data_output"
-code <- "D:/OneDrive/Active_Projects/Neah_Bay/code" 
-fig <- "D:/OneDrive/Active_Projects/Neah_Bay/figures"
+#input <- "D:/OneDrive/Active_Projects/Neah_Bay/data_input"
+#output <- "D:/OneDrive/Active_Projects/Neah_Bay/data_output"
+#code <- "D:/OneDrive/Active_Projects/Neah_Bay/code" 
+#fig <- "D:/OneDrive/Active_Projects/Neah_Bay/figures"
+
+
+## set your paths in a project folder 
+input <- "C:/Users/randellz/OneDrive - Seattle Aquarium/Documents/Seattle_Aquarium_Neah_Bay_subtidal_monitoring/data_input"
+output <- "C:/Users/randellz/OneDrive - Seattle Aquarium/Documents/Seattle_Aquarium_Neah_Bay_subtidal_monitoring/data_output"
+code <- "C:/Users/randellz/OneDrive - Seattle Aquarium/Documents/Seattle_Aquarium_Neah_Bay_subtidal_monitoring/code" 
+fig <- "C:/Users/randellz/OneDrive - Seattle Aquarium/Documents/Seattle_Aquarium_Neah_Bay_subtidal_monitoring/figures"
+
 
 setwd(input)
-dat <- read.csv("Neah_Bay_data.csv")
+dat <- read.csv("new_Neah_Bay_data.csv", header=TRUE)
 ## END startp ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -97,7 +105,7 @@ select_transect <- function(x){
 ## to select only Forward data = enter F
 ## to select only Reverse data = enter R 
 ## to select BOTH Forward and Reverse data ... don't run this function
-dat <- select_direction("F")
+dat <- select_direction("Forward")
 
 
 ## enter whatever combination of "T1", "T2", "T3", "T4" is desired
@@ -119,8 +127,10 @@ spp <- dat[,-(1:ncol_metadata)]
 ## check and see if any species have 0 observations
 colSums(spp)
 
+
 ## remove columns with 0 observations
-spp <- spp %>% select_if(negate(function(col) is.numeric(col) && sum(col) ==0))
+spp <- spp %>% select_if(negate(function(col) is.numeric(col) && sum(col) <=2))
+
 
 ## recheck to confirm columns were deleted
 colSums(spp)
