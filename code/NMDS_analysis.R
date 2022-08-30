@@ -14,27 +14,15 @@ library(tidyverse)
 library(vegan)
 
 ## set your paths in a project folder 
-#input <- "D:/OneDrive/Active_Projects/Neah_Bay/data_input"
-#output <- "D:/OneDrive/Active_Projects/Neah_Bay/data_output"
-#code <- "D:/OneDrive/Active_Projects/Neah_Bay/code" 
-#fig <- "D:/OneDrive/Active_Projects/Neah_Bay/figures"
-
-
-## set your paths in a project folder 
-input <- "C:/Users/randellz/OneDrive - Seattle Aquarium/Documents/Seattle_Aquarium_Neah_Bay_subtidal_monitoring/data_input"
-output <- "C:/Users/randellz/OneDrive - Seattle Aquarium/Documents/Seattle_Aquarium_Neah_Bay_subtidal_monitoring/data_output"
-code <- "C:/Users/randellz/OneDrive - Seattle Aquarium/Documents/Seattle_Aquarium_Neah_Bay_subtidal_monitoring/code" 
-fig <- "C:/Users/randellz/OneDrive - Seattle Aquarium/Documents/Seattle_Aquarium_Neah_Bay_subtidal_monitoring/figures"
+input <- "D:/OneDrive/Active_Projects/Neah_Bay/data_input"
+output <- "D:/OneDrive/Active_Projects/Neah_Bay/data_output"
+code <- "D:/OneDrive/Active_Projects/Neah_Bay/code" 
+fig <- "D:/OneDrive/Active_Projects/Neah_Bay/figures"
 
 
 setwd(input)
-<<<<<<< Updated upstream
 dat <- read.csv("new_Neah_Bay_data.csv", header=TRUE)
-## END startp ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-=======
-dat <- read.csv("Neah_Bay_data.csv")
 ## END startup ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->>>>>>> Stashed changes
 
 
 
@@ -118,8 +106,8 @@ dat <- select_transect(c("T1"))
 ## END data selection ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-
-dat <- subset(dat, select=-c(YOY))
+## remove YOY
+#dat <- subset(dat, select=-c(YOY))
 
 
 
@@ -165,7 +153,7 @@ ord <- metaMDS(comm = spp, distance="bray", k=2, min = 1000, trymax=2000,
 
 ## save a new ordination 
 setwd(output)
-save(ord, file = "ord_noYOY.rda")
+save(ord, file = "ord_log.rda")
 
 
 ## work with ordination: stress, NMDS coords 
@@ -191,10 +179,7 @@ ord.points <- postMDS(ord$points, dist)
 spp_scores <- as.data.frame(wascores(ord.points, spp))     
 names(spp_scores)[1] <- "spp_x"
 names(spp_scores)[2] <- "spp_y"
-write.csv(spp_scores, "spp_scores_noYOY.csv")
-
-
-
+write.csv(spp_scores, "spp_scores_log.csv")
 
 
 ## NMDS ordination coordinates saved as data frame
@@ -211,7 +196,7 @@ NMDS_coords <- save.coords(ord, info, spp)
 
 ## save final output as CSV files for further analysis / visualization  ~~~~~~~~
 setwd(output)
-write.csv(NMDS_coords,'NMDS_coords_noYOY.csv')
+write.csv(NMDS_coords,'NMDS_coords_log.csv')
 ## END save / load of final CSV output ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
