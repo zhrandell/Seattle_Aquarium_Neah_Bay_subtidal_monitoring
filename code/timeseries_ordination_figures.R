@@ -19,7 +19,7 @@ code <- "D:/OneDrive/Active_Projects/Neah_Bay/code"
 fig <- "D:/OneDrive/Active_Projects/Neah_Bay/figures"
 
 setwd(output)
-dat <- read.csv("log_NMDS_coords.csv")
+dat <- read.csv("NMDS_coords_noYOY.csv")
 #log_dat <- read.csv("log_NMDS_coords.csv")
 
 dat <- dat[,-1]
@@ -115,7 +115,7 @@ no.leg <- theme(legend.position = "none")
 
 ## plot each individual site through time ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 graphics.off()
-windows(12,6.5, record=T)
+windows(15,8, record=T)
 text.size = 4
 
 
@@ -150,8 +150,7 @@ plot.ord <- function(data, S1, S2, S3, S4, S5){
     stat_ellipse(data=S2, aes(x=NMDS1, y=NMDS2), col=site.cols[2]) +
     stat_ellipse(data=S3, aes(x=NMDS1, y=NMDS2), col=site.cols[3]) + 
     stat_ellipse(data=S4, aes(x=NMDS1, y=NMDS2), col=site.cols[4]) +
-    stat_ellipse(data=S5, aes(x=NMDS1, y=NMDS2), col=site.cols[5]) +
-    no.legend 
+    stat_ellipse(data=S5, aes(x=NMDS1, y=NMDS2), col=site.cols[5])  
   return(t2)
 }
 
@@ -204,8 +203,8 @@ windows(14, 10, record=T)
 
 plot.all.spp <- function(x){
   t1 <- ggplot(long, aes(x=Year, y=count, group=Key, color=Key)) + my.theme +
-    geom_point() + geom_path() + my.cols + no.legend + x.lab + x.breaks + ylab("log10 abundance") +
-    facet_wrap(~spp_name)#, scales="free_y") 
+    geom_point() + geom_path() + my.cols + no.legend + x.lab + x.breaks + ylab("spp abundance") +
+    facet_wrap(~spp_name, scales="free_y") 
   return(t1)
 }
 

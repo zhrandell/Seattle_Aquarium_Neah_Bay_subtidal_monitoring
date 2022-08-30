@@ -28,8 +28,13 @@ fig <- "C:/Users/randellz/OneDrive - Seattle Aquarium/Documents/Seattle_Aquarium
 
 
 setwd(input)
+<<<<<<< Updated upstream
 dat <- read.csv("new_Neah_Bay_data.csv", header=TRUE)
 ## END startp ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=======
+dat <- read.csv("Neah_Bay_data.csv")
+## END startup ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>>>>>>> Stashed changes
 
 
 
@@ -114,6 +119,8 @@ dat <- select_transect(c("T1"))
 
 
 
+dat <- subset(dat, select=-c(YOY))
+
 
 
 ## prep for NMDS analysis, transformations ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -158,7 +165,7 @@ ord <- metaMDS(comm = spp, distance="bray", k=2, min = 1000, trymax=2000,
 
 ## save a new ordination 
 setwd(output)
-save(ord, file = "ord.rda")
+save(ord, file = "ord_noYOY.rda")
 
 
 ## work with ordination: stress, NMDS coords 
@@ -184,7 +191,7 @@ ord.points <- postMDS(ord$points, dist)
 spp_scores <- as.data.frame(wascores(ord.points, spp))     
 names(spp_scores)[1] <- "spp_x"
 names(spp_scores)[2] <- "spp_y"
-write.csv(spp_scores, "spp_scores.csv")
+write.csv(spp_scores, "spp_scores_noYOY.csv")
 
 
 
@@ -204,7 +211,7 @@ NMDS_coords <- save.coords(ord, info, spp)
 
 ## save final output as CSV files for further analysis / visualization  ~~~~~~~~
 setwd(output)
-write.csv(NMDS_coords,'NMDS_coords.csv')
+write.csv(NMDS_coords,'NMDS_coords_noYOY.csv')
 ## END save / load of final CSV output ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
