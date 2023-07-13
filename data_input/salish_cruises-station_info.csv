@@ -1,0 +1,60 @@
+Name,Station #,Description,Bottom Depth (m),Latitude,Longitude,Latitude (dec),Longitude (dec),Basin
+P1,1,Gedney Island,106, 48 00.93 N, 122 18.10 W,48.016,-122.302,Whidbey
+P2,2,Port Susan,,48 07.92 N,122 23.88 W,48.132,-122.398,Whidbey
+P3,3,Saratoga Passage,150, 48 06.49 N, 122 29.53 W,48.108,-122.492,Whidbey
+P4,4,Skagit Bay,80, 48 14.52 N, 122 33.27 W,48.242,-122.555,Whidbey
+P5,5,Possession Sound,242, 47 53.00 N, 122 22.18 W,47.883,-122.37,Main Basin
+P6,6,Useless Bay,,47 55.50 N,122 28.14 W,47.925,-122.469,Main Basin
+P7,7,Mutiny Bay,77,47 58.87 N,122 37.25 W,47.981,-122.621,Admiralty
+P8,8,Hood Head,135, 47 53.75 N, 122 36.43 W,47.896,-122.607,Hood Canal
+P9,9,South Point,,47 50.04 N,122 40.02 W,47.834,-122.667,Hood Canal
+P10,10,Hood Canal Sill,53, 47 48.03 N, 122 43.14 W,47.801,-122.719,Hood Canal
+P11,11,The Great Bend,87, 47 22.21 N, 123 07.99 W,47.37,-123.133,Hood Canal
+P12,12,Hoodsport,126, 47 25.54 N, 123 06.48 W,47.426,-123.108,Hood Canal
+P13,13,Eldon,144, 47 32.79 N, 123 00.47 W,47.547,-123.008,Hood Canal
+P14,14,Hood Point,174, 47 36.36 N, 122 56.42 W,47.606,-122.94,Hood Canal
+P15,15,Dabob Bay,133, 47 39.68 N, 122 51.60 W,47.661,-122.86,Hood Canal
+P16,16,Hazel Point,, 47 41.47 N, 122 45.99 W,47.691,-122.767,Hood Canal
+P17,17,Bangor,105, 47 44.13 N, 122 45.67 W,47.736,-122.761,Hood Canal
+P18,18,Bush Point,,48 01.98 N,122 37.08 W,48.033,-122.618,Admiralty
+P19,19,Lagoon Point,, 48 05.55 N, 122 37.91 W,48.093,-122.632,Admiralty
+P20,20,Admiralty Head,80, 48 08.29 N, 122 40.93 W,48.138,-122.682,Eastern Strait
+P21,21,Buoy SA,77, 48 11.38 N, 122 50.96 W,48.19,-122.849,Eastern Strait
+P22,22,Eastern Bank,101, 48 16.37 N, 123 01.16 W,48.273,-123.019,Eastern Strait
+P23,23,Off Sequim,146,48 14.42 N,123 13.68 W,48.24,-123.228,Strait of Juan de Fuca
+P24,24,Hein Bank,,48 20.24 N,123 07.58 W,48.3373,-123.12632,Strait of Juan de Fuca
+P25,25,S of South Bank,,48 23.95 N,123 00.56 W,48.3992,-123.00932,San Juan Islands
+P26,26,SW of Deception,99, 48 22.36 N, 122 43.23 W,48.373,-122.721,Eastern Strait
+P27,27,Apple Cove Pt,197,47 48.80 N,122 27.25 W,47.813,-122.454,Central Sound
+P28,28,North of West Pt,197,47 42.17 N,122 27.21 W,47.703,-122.454,Central Sound
+P29,29,South of Alki Pt,238, 47 33.43 N, 122 26.64 W,47.557,-122.444,Central Sound
+P30,30,Three Tree Point,216, 47 27.44 N, 122 24.56 W,47.457,-122.409,Central Sound
+P31,31,Point Robinson,217, 47 23.61 N, 122 21.53 W,47.394,-122.359,Central Sound
+P32,32,Point Piner,,47 20.06 N,122 26.42 W,47.33426,-122.44034,Central Sound
+P33,33,Dalco Passage,151, 47 19.21 N, 122 30.05 W,47.32,-122.501,Central Sound
+P34,34,Tacoma Narrows,,47 17.16 N,122 32.34 W,47.286,-122.539,Central Sound
+P35,35,lagoon Point,165, 47 10.93 N, 122 37.91 W,47.182,-122.632,South Sound
+P36,36,Devils Head,102, 47 10.03 N, 122 46.92 W,47.167,-122.782,South Sound
+P37,37,Case Inlet,,47 15.89 N,122 51.19 W,47.26488,-122.85328,South Sound
+P38,38,Carr Inlet,101, 47 16.60 N, 122 42.09 W,47.277,-122.702,South Sound
+P39,39,Colvos Passage,,47 25.02 N,122 31.62 W,47.417,-122.527,Central Sound
+P51,51,Dabob Bay off Seal Rock,,47 41.94 N,122 52.02 W,47.699,-122.867,Hood Canal
+P52,52,Totten Inlet,,47 08.04 N,123 00.96 W,47.134,-123.016,South Sound
+P105,105,Strait of Juan de Fuca 1,349,48 15.99 N,125 00.98 W,48.267,-125.016,WA Coast
+P111,111,Strait of Juan de Fuca 2,320,48 22.02 N,124 53.64 W,48.367,-124.894,WA Coast
+P119,119,Strait of Juan de Fuca 3,,48 25.98 N,124 49.20 W,48.433,-124.82,Strait of Juan de Fuca
+P120,120,Strait of Juan de Fuca 4,297,48 27.90 N, 124 46.97 W,48.465,-124.783,Strait of Juan de Fuca
+P122,122,Strait of Juan de Fuca 5,,48 28.44 N,124 41.40 W,48.474,-124.69,Strait of Juan de Fuca
+P123,123,Strait of Juan de Fuca 6,232,48 23.81 N,124 26.00 W,48.397,-124.433,Strait of Juan de Fuca
+P128,128,Strait of Juan de Fuca 7,214,48 21.12 N,124 16.06 W,48.352,-124.268,Strait of Juan de Fuca
+P131,131,Strait of Juan de Fuca 8,192,48 17.91 N,124 06.03 W,48.299,-124.101,Strait of Juan de Fuca
+P132,132,Strait of Juan de Fuca 9,170, 48 16.32 N, 123 58.96 W,48.272,-123.983,Strait of Juan de Fuca
+P133,133,Strait of Juan de Fuca 10,156,48 14.59 N,123 43.85 W,48.243,-123.731,Strait of Juan de Fuca
+P136,136,Strait of Juan de Fuca 11,145, 48 13.40 N, 123 28.98 W,48.223,-123.483,Strait of Juan de Fuca
+P381 Nemo,381,Nemo,102, 47 58.09 N, 124 57.03 W,47.968,-124.951,WA Coast
+P381 Chaba,381,Chaba,101, 47 57.87 N, 124 57.07 W,47.965,-124.951,WA Coast
+P401,401,Ayock Pt. (P40),157, 47 29.39 N, 123 03.41 W,47.49,-123.057,Hood Canal
+P402,402,Sisters Point,54, 47 21.36 N, 123 01.42 W,47.356,-123.024,Hood Canal
+P403,403,Lynch Cove,,47 41.94 N,122 52.02 W,47.699,-122.867,Hood Canal
+P404,404,Totten Inlet,,47 08.04 N,123 00.96 W,47.134,-123.016,South Sound
+P500,500,Port of Seattle,,47 35.82 N,122 21.90 W,47.597,-122.365,Central Sound
