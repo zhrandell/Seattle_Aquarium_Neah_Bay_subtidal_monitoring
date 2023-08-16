@@ -14,14 +14,11 @@ library(tidyverse)
 library(vegan)
 
 ## set your paths in a project folder 
-input <- "D:/OneDrive/Active_Projects/Neah_Bay/data_input"
-output <- "D:/OneDrive/Active_Projects/Neah_Bay/data_output"
-code <- "D:/OneDrive/Active_Projects/Neah_Bay/code" 
-fig <- "D:/OneDrive/Active_Projects/Neah_Bay/figures"
-
+input <- "C:/Users/randellz/Dropbox (Seattle Aquarium)/Coastal Complexity & Resilience Team Folder/GitHub/Seattle_Aquarium_Neah_Bay_subtidal_monitoring/data_input"
+output <- "C:/Users/randellz/Dropbox (Seattle Aquarium)/Coastal Complexity & Resilience Team Folder/GitHub/Seattle_Aquarium_Neah_Bay_subtidal_monitoring/data_output"
 
 setwd(input)
-dat <- read.csv("new_Neah_Bay_data.csv", header=TRUE)
+dat <- read.csv("Neah_Bay_data.csv", header=TRUE)
 ## END startup ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -29,9 +26,9 @@ dat <- read.csv("new_Neah_Bay_data.csv", header=TRUE)
 
 
 ## tidy up data ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-## remove first column, Location 
+## remove first column & rename col 
 dat <- dat[-1]
-
+colnames(dat)[5] <- 'Black & Deacon'
 
 ## removes "Site" from the Site column, leaving just the #
 dat$Site <- gsub("^.{0,5}", "", dat$Site)
@@ -95,9 +92,7 @@ select_transect <- function(x){
 }
 
 
-## to select only Forward data = enter F
-## to select only Reverse data = enter R 
-## to select BOTH Forward and Reverse data ... don't run this function
+## to select only Forward data = enter "Forward" 
 dat <- select_direction("Forward")
 
 
@@ -106,8 +101,8 @@ dat <- select_transect(c("T1"))
 ## END data selection ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-## remove YOY
-#dat <- subset(dat, select=-c(YOY))
+## drop YOY
+dat <- subset(dat, select = -c(YOY))
 
 
 
@@ -129,17 +124,6 @@ spp <- spp %>% select_if(negate(function(col) is.numeric(col) && sum(col) <=2))
 
 ## recheck to confirm columns were deleted
 colSums(spp)
-
-
-
-## perform log_transform, if desired
-log_transform <- function(x){
-  out <- log10(x+1)
-  return(out)
-}
-
-## run, if desired
-spp <- log_transform(spp)
 ## END NMDS prep ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -153,12 +137,11 @@ ord <- metaMDS(comm = spp, distance="bray", k=2, min = 1000, trymax=2000,
 
 ## save a new ordination 
 setwd(output)
-save(ord, file = "ord_log.rda")
+save(ord, file = "ord_T1_no_YOY.rda")
 
 
 ## work with ordination: stress, NMDS coords 
-setwd(output)
-load("ord.rda")
+load("ord_T1_only.rda")
 
 
 ## visualize stress, check ordination, xy coordinates 
@@ -179,7 +162,7 @@ ord.points <- postMDS(ord$points, dist)
 spp_scores <- as.data.frame(wascores(ord.points, spp))     
 names(spp_scores)[1] <- "spp_x"
 names(spp_scores)[2] <- "spp_y"
-write.csv(spp_scores, "spp_scores_log.csv")
+write.csv(spp_scores, "spp_scores_T1_no_YOY.csv")
 
 
 ## NMDS ordination coordinates saved as data frame
@@ -191,12 +174,12 @@ save.coords <- function(ord, info, spp){
 
 
 ## bind nmds coordinates to dataframe with site info and spp counts
-NMDS_coords <- save.coords(ord, info, spp)
+NMDS_coords <- save.coords(ord.points, info, spp)
 
 
 ## save final output as CSV files for further analysis / visualization  ~~~~~~~~
 setwd(output)
-write.csv(NMDS_coords,'NMDS_coords_log.csv')
+write.csv(NMDS_coords,'NMDS_coords_T1_no_YOY.csv')
 ## END save / load of final CSV output ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
