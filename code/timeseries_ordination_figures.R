@@ -22,6 +22,7 @@ output <- "D:/OneDrive/Active_Projects/Neah_Bay/data_output"
 code <- "D:/OneDrive/Active_Projects/Neah_Bay/code" 
 fig <- "D:/OneDrive/Active_Projects/Neah_Bay/figures"
 
+output <- "C:/Users/randellz/Dropbox (Seattle Aquarium)/Coastal Complexity & Resilience Team Folder/GitHub/Seattle_Aquarium_Neah_Bay_subtidal_monitoring/data_output"
 
 setwd(output)
 dat <- read.csv("NMDS_coords.csv")
@@ -93,7 +94,7 @@ change.pt <- function(col, spp){
   t1 <- dat.avg[, c(1, col)]
   t2 <- t1 %>% spread(Year, spp)
   t3 <- as.numeric(t2)
-  out <- cpt.meanvar(t3, Q=5)
+  out <- cpt.meanvar(t3, Q=5, method="AMOC")
   return(out)
 }
 
