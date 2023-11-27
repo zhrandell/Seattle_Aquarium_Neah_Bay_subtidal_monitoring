@@ -96,33 +96,6 @@ print(posthocs1)
 ##RESULT: KW p-value=0.081 AKA marginally significant. 
 #Dunn's posthocs test: 2010 vs. 2016 p=0.019
 
-#Individual comparisons
-test <- dat %>% 
-  select(-Total) %>% 
-  pivot_wider(names_from=Year,values_from = YOY)
-
-#vectors for years with no sites removed
-y05 <- c(3)
-y06 <- c(38,60,50,0)
-y07 <- c(0,1,0,0)
-y08 <- c(0,0,0,348)
-y09 <- c(0,4,0,30)
-y10 <- c(0,0,0,0,0)
-y11 <- c(20,0,0,170,0)
-y12 <- c(105,50,0,281,0)
-y13 <- c(400,120,0,250,0)
-y14 <- c(10,0,0,0,0)
-y15 <- c(160,10,0,65,0)
-y16 <- c(1950,1150,160,1150)
-y17 <- c(30,0,10,0,0)
-y18 <- c(0,0,50,150,0)
-y19 <- c(10,0,0,20,0)
-y21 <- c(8,0,0,181)
-y22 <- c(2,0,0,201,0)
-y23 <- c(90,2,4,25,17)
-
-wilcox.test(y13,y06,paired=FALSE)
-
 ################################################################################
 #OUTLIER DETECTION
 ################################################################################
@@ -134,7 +107,7 @@ ggplot(dat) + aes(y = YOY) +
 #determine values of outliers
 boxplot.stats(dat$YOY)$out
 
-boxplot.stats(dat$YOY)
+boxplot.stats(dat$YOY) #120 is extreme of upper whisker
 
 ################################################################################
 ##VISUALIZATION

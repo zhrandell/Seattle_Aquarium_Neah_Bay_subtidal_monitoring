@@ -73,13 +73,14 @@ ggplot(data=test, aes(x=Year,y=Total,group=Site, fill=Site)) +
 
 #Figure 3
 test2 <- test %>%
+  drop_na() %>%
   filter(Species != "Halibut") %>%
   filter(Species != "Wolfeel") %>%
   filter(Species != "Puget_Sound") #remove counts less than 2
 
 #plot at 1500x1000
 #Option 3- keep
-descending <- c("Black_Deacon","Widow","Greenling","Yellowtail","Canary","China","Lingcod","Quillback","Copper","Cabezon","Tiger","Vermilion","Yelloweye")
+descending <- c("Black","Widow","Greenling","Yellowtail","Canary","China","Lingcod","Quillback","Copper","Cabezon","Tiger","Vermillion","Yelloweye")
 
 ggplot(data=test2,aes(x=Year,y=Count)) +
   geom_point(size=2.5, alpha=0.5, aes(shape=Site,group=Site, fill=Site))+
@@ -155,29 +156,32 @@ qqline(dat.avg$Vermilion)
 
 shapiro.test(data$Avg) #non-normal
 shapiro.test(dat.avg$Canary) #non-normal
+shapiro.test(dat.avg$China) #NORMAL
 shapiro.test(dat.avg$Copper) #non-normal
+shapiro.test(dat.avg$Greenling) #NORMAL
 shapiro.test(dat.avg$Quillback) #non-normal
-shapiro.test(dat.avg$Vermilion) #non-normal
+shapiro.test(dat.avg$Tiger) #non-normal
+shapiro.test(dat.avg$Yellowtail) #non-normal
 #shapiro.test(RF.dat$Avg) #normal
 
 #MAKE FUNCTIONS ---------------------------------------------------------------------
 
 ##function to calculate confidence intervals
-#conf.cpt <- function(col){
-#  t1 <- as.vector(dat.avg[col])
-#  t2 <- as.numeric(unlist(t1))
-#  out <- cpt.meanvar(t2, penalty="Asymptotic", pen.value=0.05, method="AMOC", class=FALSE)
-#  return(out)
-#}
+conf.cpt <- function(col){
+  t1 <- as.vector(dat.avg[col])
+  t2 <- as.numeric(unlist(t1))
+  out <- cpt.meanvar(t2, penalty="Asymptotic", pen.value=0.05, method="AMOC", class=FALSE)
+  return(out)
+}
 
 ##function to generate meanvar plots
-#change.pt <- function(col, spp){
-#  t1 <- dat.avg[, c(1, col)]
-#  t2 <- t1 %>% spread(Year, spp)
-#  t3 <- as.numeric(t2)
-#  out <- cpt.meanvar(t3, Q=5)
-#  return(out)
-#}
+change.pt <- function(col, spp){
+  t1 <- dat.avg[, c(1, col)]
+  t2 <- t1 %>% spread(Year, spp)
+  t3 <- as.numeric(t2)
+  out <- cpt.meanvar(t3, Q=5)
+  return(out)
+}
 
 ##function to calculate changepoints non-parametrically
 np.cpt <- function(col){
@@ -198,7 +202,7 @@ np.cpt <- function(col){
 
 #list of excluded species, where there is no clear changepoint or changepoint is at the beginning or end: 
 #Black(2), Cabezon(3), China(5), Greenling(7), Lingcod(8), Tiger(10), Widow(11),
-#Wolfeel(12), Yellowtail(13), YOY(14), Halibut(16), Yelloweye(17), Puget_Sound(18)
+#Wolfeel(12), Yellowtail(13), YOY(14), Vermilion(15), Halibut(16), Yelloweye(17), Puget_Sound(18)
 
 #cCanary <- conf.cpt(4) #cpt @6, conf 0.999
 #Canary <- change.pt(4, "Canary") #mean/var goes from 0/0 to 1.43/1.56 @6
@@ -212,9 +216,11 @@ npCopper <- np.cpt(6) #cpt @8
 #Quillback <- change.pt(9, "Quillback") #mean/var goes from 0/0 to 0.37/0.16 @4
 npQuillback <- np.cpt(9) #cpt @10
 
-#cVermilion <- conf.cpt(15) #cpt @9 conf 0.999
-#Vermilion <- change.pt(15, "Vermilion") #mean/var goes from 0/0 to 0.24/0.04 @9
-npVermilion <- np.cpt(15) #cpt @9
+cChina <- conf.cpt(5) 
+China <- change.pt(5, "China")
+
+cGreenling <- conf.cpt(7) 
+Greenling <- change.pt(7, "Greenling")
 
 #commands to run through param.est(x), plot(x), summary(x)
 
@@ -243,39 +249,48 @@ Adata <- RF.long.dat %>%
 Bdata <- RF.long.dat %>%
   filter(Species == "Canary")
 
-Cdata <- RF.long.dat %>%
-  filter(Species=="Vermillion")
-
 Ddata <- RF.long.dat %>%
   filter(Species == "Quillback")
+
+Edata <- RF.long.dat %>%
+  filter(Species == "China")
+
+Fdata <- RF.long.dat %>%
+  filter(Species == "Tiger")
 
 #Create individual plots
 A <- ggplot(data=Adata, aes(x=Year, y=Count)) +
   geom_boxplot(aes(group=Year)) +
   theme_cowplot() + ylab("No. copper") +
-  annotate("segment", x=2012, xend=2012, y=0, yend=5, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
+  annotate("segment", x=2012, xend=2012, y=0, yend=4, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
   ggtitle("(a)")
 
 B <- ggplot(data=Bdata, aes(x=Year, y=Count)) +
   geom_boxplot(aes(group=Year)) +
   theme_cowplot() + ylab("No. canary") +
-  annotate("segment", x=2013, xend=2013, y=0, yend=14, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
+  annotate("segment", x=2012, xend=2012, y=0, yend=14, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
   ggtitle("(b)")
-
-C <- ggplot(data=Cdata, aes(x=Year, y=Count)) +
-  geom_boxplot(aes(group=Year)) +
-  theme_cowplot() + ylab("No. vermilion") +
-  annotate("segment", x=2013, xend=2013, y=0, yend=1, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
-  ggtitle("(c)")
 
 D <-ggplot(data=Ddata, aes(x=Year, y=Count)) +
   geom_boxplot(aes(group=Year)) +
   theme_cowplot() + ylab("No. quillback") +
-  annotate("segment", x=2014, xend=2014, y=0, yend=5, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
+  annotate("segment", x=2014, xend=2014, y=0, yend=7, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
   ggtitle("(d)")
 
+E <-ggplot(data=Edata, aes(x=Year, y=Count)) +
+  geom_boxplot(aes(group=Year)) +
+  theme_cowplot() + ylab("No. china") +
+  annotate("segment", x=2021, xend=2021, y=0, yend=16, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
+  ggtitle("(e)")
+
+F <-ggplot(data=Fdata, aes(x=Year, y=Count)) +
+  geom_boxplot(aes(group=Year)) +
+  theme_cowplot() + ylab("No. tiger") +
+  annotate("segment", x=2019, xend=2019, y=0, yend=4, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
+  ggtitle("(f)")
+
 #Create multipaneled plot
-ggarrange(A,B,C,D)
+ggarrange(A,B,D,E,F)
 
 #Housekeeping
 rm(A,Adata,B,Bdata,C,Cdata,D,Ddata)
@@ -303,51 +318,31 @@ pos <- dat.avg %>%
   filter(Species=="Copper" & Year > 2012) %>%
   pull(Count)
 
-#mean=0.813
+#mean=0.79
 
 wilcox.test(pre,pos)
 
-#p-value=0.003722
+#p-value=0.001747
 
 #CANARY ROCKFISH ---------------------------------------------------------------
 
 pre <- dat.avg %>%
   pivot_longer(cols=c(2:18),names_to="Species", values_to="Count") %>% 
-  filter(Species=="Canary" & Year < 2013) %>%
+  filter(Species=="Canary" & Year < 2012) %>%
   pull(Count)
 
-#mean=0.025
+#mean=0.0286
 
 pos <- dat.avg %>%
   pivot_longer(cols=c(2:18),names_to="Species", values_to="Count") %>% 
-  filter(Species=="Canary" & Year > 2013) %>%
+  filter(Species=="Canary" & Year > 2012) %>%
   pull(Count)
 
-#mean=1.986
+#mean=1.47
 
 wilcox.test(pre,pos)
 
-#p-value=0.0007851
-
-#VERMILION ROCKFISH ------------------------------------------------------------
-
-pre <- dat.avg %>%
-  pivot_longer(cols=c(2:18),names_to="Species", values_to="Count") %>% 
-  filter(Species=="Vermilion" & Year < 2013) %>%
-  pull(Count)
-
-#mean=0
-
-pos <- dat.avg %>%
-  pivot_longer(cols=c(2:18),names_to="Species", values_to="Count") %>% 
-  filter(Species=="Vermilion" & Year > 2013) %>%
-  pull(Count)
-
-#mean=0.236
-
-wilcox.test(pre,pos)
-
-#p-value=0.007137
+#p-value=0.000801
 
 #QUILLBACK ROCKFISH ------------------------------------------------------------
 
@@ -363,11 +358,49 @@ pos <- dat.avg %>%
   filter(Species=="Quillback" & Year > 2014) %>%
   pull(Count)
 
-#mean=0.658
+#mean=0.97
 
 wilcox.test(pre,pos)
 
-#p-value=0.0008778
+#CHINA ROCKFISH ------------------------------------------------------------
+
+pre <- dat.avg %>%
+  pivot_longer(cols=c(2:18),names_to="Species", values_to="Count") %>% 
+  filter(Species=="China" & Year < 2021) %>%
+  pull(Count)
+
+#mean=3.52
+
+pos <- dat.avg %>%
+  pivot_longer(cols=c(2:18),names_to="Species", values_to="Count") %>% 
+  filter(Species=="China" & Year > 2021) %>%
+  pull(Count)
+
+#mean=9.5
+
+wilcox.test(pre,pos)
+
+#p-value=0.03025
+
+#TIGER ROCKFISH ------------------------------------------------------------
+
+pre <- dat.avg %>%
+  pivot_longer(cols=c(2:18),names_to="Species", values_to="Count") %>% 
+  filter(Species=="Tiger" & Year < 2019) %>%
+  pull(Count)
+
+#mean=0.25
+
+pos <- dat.avg %>%
+  pivot_longer(cols=c(2:18),names_to="Species", values_to="Count") %>% 
+  filter(Species=="Tiger" & Year > 2019) %>%
+  pull(Count)
+
+#mean=1.2
+
+wilcox.test(pre,pos)
+
+#p-value = 0.0219
 
 #HOUSEKEEPING
 rm(pre,pos)

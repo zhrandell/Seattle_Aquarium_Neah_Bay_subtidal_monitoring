@@ -19,7 +19,7 @@ library(cowplot)
 #Load data files
 setwd("C:/Users/shelledyk/OneDrive - Seattle Aquarium/Documents/NeahBay/Seattle_Aquarium_Neah_Bay_subtidal_monitoring/data_input")
 
-marine.dat <- read_csv("new_Neah_Bay_data.csv")
+marine.dat <- read_csv("Neah_Bay_data.csv")
 landings.dat <- read_csv("RecFIN_landings_2000to2022.csv")
 
 #tweak databases so their formatting is ready for merging
@@ -70,7 +70,7 @@ ggplot(dat, aes(x=SEAQ_Count, y=RecFin_Count)) +
   geom_point() + geom_smooth(method="glm", se=FALSE) + theme_cowplot() + 
   xlab("Dive survey counts") + ylab("Creel landings") + 
   scale_y_continuous(trans="log2") + scale_x_continuous(trans="log2") +
-  annotate("text", x=500, y=18, label="Tau=0.392  ")+
+  annotate("text", x=500, y=18, label="Tau=0.398  ")+
   annotate("text", x=500, y=10, label="p=2.2e-16**") #p=2.2e-16, tau=0.392 #https://www.statology.org/add-text-to-ggplot/#:~:text=You%20can%20use%20the%20annotate,text%20to%20plots%20in%20ggplot2.&text=where%3A,label%3A%20The%20text%20to%20display.
 
 time.dat <- dat %>%
@@ -82,7 +82,7 @@ ggplot(time.dat, aes(x=Year, y=Count, group=Method, color=Method)) +
 
 #run correlations
 cor.all <- cor.test(dat$SEAQ_Count, dat$RecFin_Count, method = "kendall")
-print(cor.all) #significant positive p=2.2e-16, tau=0.392
+print(cor.all) #significant positive p=2.2e-16, tau=0.398
 
 lm <- lm(RecFin_Count ~ SEAQ_Count, data=dat)
 

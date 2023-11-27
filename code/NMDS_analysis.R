@@ -137,6 +137,7 @@ ord <- metaMDS(comm = spp, distance="bray", k=2, min = 1000, trymax=2000,
 
 ## save a new ordination 
 setwd(output)
+#setwd("C:/Users/shelledyk/OneDrive - Seattle Aquarium/Documents/NeahBay/Seattle_Aquarium_Neah_Bay_subtidal_monitoring/data_output")
 save(ord, file = "ord_T1_no_YOY.rda")
 
 
