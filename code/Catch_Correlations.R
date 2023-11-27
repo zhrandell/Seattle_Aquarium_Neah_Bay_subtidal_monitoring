@@ -3,7 +3,7 @@
 ###############################################################################
 
 #This code is to compare our underwater observations with fisheries landings.
-#Years of interest: 2005-2021
+#Years of interest: 2005-2023
 
 ###############################################################################
 #PREP WORK
@@ -17,7 +17,7 @@ library(ggpubr)
 library(cowplot)
 
 #Load data files
-setwd("C:/Users/shelledyk/OneDrive - Seattle Aquarium/Documents/NeahBayRockfish/Raw_data")
+setwd("C:/Users/shelledyk/OneDrive - Seattle Aquarium/Documents/NeahBay/Seattle_Aquarium_Neah_Bay_subtidal_monitoring/data_input")
 
 marine.dat <- read_csv("new_Neah_Bay_data.csv")
 landings.dat <- read_csv("RecFIN_landings_2000to2022.csv")
@@ -64,7 +64,7 @@ dat["RecFin_Count"][is.na(dat["RecFin_Count"])] <- 0 #Add zero count where NAs f
 dat <- dat %>%
   select(Year, Location, Species, RecFin_Count, SEAQ_Count)
 
-#plotting
+#plotting (500x400)
 
 ggplot(dat, aes(x=SEAQ_Count, y=RecFin_Count)) +
   geom_point() + geom_smooth(method="glm", se=FALSE) + theme_cowplot() + 

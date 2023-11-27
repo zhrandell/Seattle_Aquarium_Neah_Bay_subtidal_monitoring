@@ -19,7 +19,7 @@ library(data.table)
 library(lubridate)
 
 #Upload data
-setwd("C:/Users/shelledyk/OneDrive - Seattle Aquarium/Documents/NeahBayRockfish/Envmtl_data")
+setwd("C:/Users/shelledyk/OneDrive - Seattle Aquarium/Documents/NeahBay/Seattle_Aquarium_Neah_Bay_subtidal_monitoring/data_input")
 
 Aug1999_down <- read.csv("SalishCruise_August1999_downcast.csv")
 Aug1999_up <- read.csv("SalishCruise_August1999_labupcast.csv")
