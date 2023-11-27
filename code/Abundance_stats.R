@@ -244,7 +244,7 @@ Bdata <- RF.long.dat %>%
   filter(Species == "Canary")
 
 Cdata <- RF.long.dat %>%
-  filter(Species=="Vermilion")
+  filter(Species=="Vermillion")
 
 Ddata <- RF.long.dat %>%
   filter(Species == "Quillback")

@@ -17,9 +17,8 @@ library(FSA)
 library(PMCMRplus)
 
 #Load data files
-setwd("C:/Users/shelledyk/OneDrive - Seattle Aquarium/Documents/NeahBayRockfish/Raw_data")
-
-dat <- read_csv("new_Neah_Bay_data.csv")
+setwd("C:/Users/shelledyk/OneDrive - Seattle Aquarium/Documents/NeahBay/Seattle_Aquarium_Neah_Bay_subtidal_monitoring")
+dat <- read_csv("data_input/Neah_Bay_data.csv")
 
 ################################################################################
 ##DATA CLEANING
@@ -94,8 +93,8 @@ print(posthocs1)
 
 #Results:
 
-##RESULT: KW p-value=0.086 AKA marginally significant. 
-#Dunn's posthocs test: 2014 vs. 2016 p=0.084; 2010 vs. 2016 p=0.018
+##RESULT: KW p-value=0.081 AKA marginally significant. 
+#Dunn's posthocs test: 2010 vs. 2016 p=0.019
 
 #Individual comparisons
 test <- dat %>% 
@@ -119,17 +118,35 @@ y17 <- c(30,0,10,0,0)
 y18 <- c(0,0,50,150,0)
 y19 <- c(10,0,0,20,0)
 y21 <- c(8,0,0,181)
+y22 <- c(2,0,0,201,0)
+y23 <- c(90,2,4,25,17)
 
 wilcox.test(y13,y06,paired=FALSE)
 
 ################################################################################
+#OUTLIER DETECTION
+################################################################################
+
+#make boxplot to see number of suspected outliers
+ggplot(dat) + aes(y = YOY) +
+  geom_boxplot(alpha=0.5) + theme_minimal()
+
+#determine values of outliers
+boxplot.stats(dat$YOY)$out
+
+boxplot.stats(dat$YOY)
+
+################################################################################
 ##VISUALIZATION
 ################################################################################
+
+#Figure 5, 500x300
 ggplot(dat, aes(x=Year, y=YOY)) +
   geom_boxplot(aes(group=Year)) +
   theme_cowplot() +
   ylab("Young-of-the-year count") +
-  scale_y_continuous(trans="log2") #+
+  annotate("segment", x=2005, xend=2023, y=120, yend=120, color="gray", linewidth=0.5, linetype="dashed") #+
+  #scale_y_continuous(trans="log2") #+
   #stat_compare_means(comparisons=my_comparisons)
   #geom_line(aes(group=Site, color=Site))
 
