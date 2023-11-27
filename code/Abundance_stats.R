@@ -4,7 +4,7 @@
 
 #This code is to evaluate our abundance data for significant changes over time.
 #Methods: Changepoint analysis and PCA
-#Years of interest: 2005-2021
+#Years of interest: 2005-2023
 
 ###############################################################################
 #PREP WORK
@@ -16,8 +16,8 @@ library(ggplot2)
 library(cowplot)
 
 #Load data
-setwd("C:/Users/shelledyk/OneDrive - Seattle Aquarium/Documents/NeahBayRockfish/Raw_data")
-dat <- read_csv("new_Neah_Bay_data.csv")
+setwd("C:/Users/shelledyk/OneDrive - Seattle Aquarium/Documents/NeahBay/Seattle_Aquarium_Neah_Bay_subtidal_monitoring")
+dat <- read_csv("data_input/Neah_Bay_data.csv")
 
 #Tidy data
 dat <- dat %>% 
@@ -31,26 +31,65 @@ RF.dat <- dat %>%
   select(-c(Cabezon, Greenling, Halibut, Lingcod, Wolfeel, YOY)) %>%
   rowwise() %>%
   mutate(Total = sum(c(Black, Canary, China, Copper, Puget_Sound, Quillback, 
-                       Tiger, Vermilion, Widow, Yelloweye, Yellowtail))) %>%
+                       Tiger, Vermillion, Widow, Yelloweye, Yellowtail))) %>%
   ungroup() %>%
   group_by(Year) %>%
   mutate(Avg = mean(Total)) %>%
   select(c(Year, Avg)) %>%
-  unique()
+  unique() #create database with just rockfish, including a column with total and average totals
 
 RF.long.dat <- long.dat %>%
   filter(Species %in% c("Black", "Canary", "China", "Copper", "Puget_Sound", 
-                        "Quillback", "Tiger", "Vermilion", "Widow", "Yelloweye",
-                        "Yellowtail"))
+                        "Quillback", "Tiger", "Vermillion", "Widow", "Yelloweye",
+                        "Yellowtail")) #create a tidy version for ggplot2
 
-#Visualize
+#Visualize species of interest
 
 data <- RF.long.dat %>%
-  filter(Species %in% c("Quillback", "Canary", "Yellowtail","Copper", "Vermilion"))
+  filter(Species %in% c("Quillback", "Canary", "Yellowtail","Copper", "Vermillion"))
 
 ggplot(data=data, aes(x=Year, y=Count)) +
   geom_boxplot(aes(group=Year)) +
   theme_cowplot() + facet_wrap(~Species)
+
+################################################################################
+#PRELIMINARY VISUALIZATIONS (FIGURE 2-3)
+################################################################################
+test <- long.dat %>% 
+  filter(Species!="YOY")%>%
+  group_by(Year,Site)%>%
+  mutate(Total=sum(Count))
+
+#Figure 2 OPTION 2- keep. plot at 750x400
+ggplot(data=test, aes(x=Year,y=Total,group=Site, fill=Site)) +
+  geom_point(size=2, alpha=0.5, aes(shape=Site)) +
+  geom_smooth(method="lm",se=FALSE, linewidth=0.75, color="gray25") +
+  scale_shape_manual(values=c(21,22,23,24,25))+
+  scale_fill_manual(values=c("#E69F00", "#56B4E9","#009E73","#F0E442","#CC79A7"))+
+  facet_wrap(~Site) +
+  ylab("Total adult fish")+
+  theme_cowplot()+
+  theme(legend.position="none")
+
+#Figure 3
+test2 <- test %>%
+  filter(Species != "Halibut") %>%
+  filter(Species != "Wolfeel") %>%
+  filter(Species != "Puget_Sound") #remove counts less than 2
+
+#plot at 1500x1000
+#Option 3- keep
+descending <- c("Black_Deacon","Widow","Greenling","Yellowtail","Canary","China","Lingcod","Quillback","Copper","Cabezon","Tiger","Vermilion","Yelloweye")
+
+ggplot(data=test2,aes(x=Year,y=Count)) +
+  geom_point(size=2.5, alpha=0.5, aes(shape=Site,group=Site, fill=Site))+
+  geom_smooth(method="lm",se=FALSE, linewidth=0.75, color="gray25")+
+  scale_shape_manual(values=c(21,22,23,24,25))+
+  scale_fill_manual(values=c("#E69F00", "#56B4E9","#009E73","#F0E442","#CC79A7"))+
+  scale_color_manual(values=c("#E69F00", "#56B4E9","#009E73","#F0E442","#CC79A7"))+
+  facet_wrap(~factor(Species, levels=descending), scales="free",nrow=3) +
+  theme_cowplot() +
+  theme(text = element_text(size = 20))
 
 ################################################################################
 #CHANGEPOINT ANALYSIS
