@@ -19,6 +19,10 @@ output <- "C:/Users/randellz/Dropbox (Seattle Aquarium)/Coastal Complexity & Res
 
 setwd(input)
 dat <- read.csv("Neah_Bay_data.csv", header=TRUE)
+
+#Path must be set by user
+setwd("C:/Users/shelledyk/OneDrive - Seattle Aquarium/Documents/NeahBay/Seattle_Aquarium_Neah_Bay_subtidal_monitoring")
+dat <- read_csv("data_input/Neah_Bay_data.csv")
 ## END startup ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 

@@ -100,7 +100,7 @@ change.pt <- function(col, spp){
 
 
 
-Black <- change.pt(2, "Black")
+Black <- change.pt(2, "Black & Deacon")
 Cabezon <- change.pt(3, "Cabezon")
 Canary <- change.pt(4, "Canary")
 China <- change.pt(5, "China")
@@ -111,9 +111,9 @@ Quillback <- change.pt(9, "Quillback")
 Tiger <- change.pt(10, "Tiger")
 Widow <- change.pt(11, "Widow")
 Yellowtail <- change.pt(12, "Yellowtail")
-YOY <- change.pt(13, "YOY")
-Vermillion <- change.pt(14, "Vermillion")
-Yelloweye <- change.pt(15, "Yelloweye")
+#YOY <- change.pt(13, "YOY")
+Vermillion <- change.pt(13, "Vermillion")
+Yelloweye <- change.pt(14, "Yelloweye")
 
 
 ## plot changepoints 
@@ -133,7 +133,7 @@ plot.changepts <- function(spp, full_spp, title){
 }
 
 
-p.black <- plot.changepts(Black, dat.avg$Black, "Black & Deacon Rockfish")
+p.black <- plot.changepts(Black, dat.avg$`Black & Deacon`, "Black & Deacon Rockfish")
 print(p.black)
 
 p.china <- plot.changepts(China, dat.avg$China, "China Rockfish")
