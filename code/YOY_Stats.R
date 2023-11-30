@@ -123,6 +123,13 @@ ggplot(dat, aes(x=Year, y=YOY)) +
   #stat_compare_means(comparisons=my_comparisons)
   #geom_line(aes(group=Site, color=Site))
 
+#Alternate to Figure 5
+ggplot(dat, aes(x=Year, y=YOY)) +
+  geom_point(size=5,alpha=0.25) +
+  theme_cowplot() +
+  ylab("Young-of-the-year count") +
+  annotate("segment", x=2005, xend=2023, y=120, yend=120, color="red", linewidth=0.5, linetype="dashed")
+
 fig.dat <- dat %>%
   select(Year, Total) %>%
   unique()

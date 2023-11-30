@@ -43,15 +43,6 @@ RF.long.dat <- long.dat %>%
                         "Quillback", "Tiger", "Vermillion", "Widow", "Yelloweye",
                         "Yellowtail")) #create a tidy version for ggplot2
 
-#Visualize species of interest
-
-data <- RF.long.dat %>%
-  filter(Species %in% c("Quillback", "Canary", "Yellowtail","Copper", "Vermillion"))
-
-ggplot(data=data, aes(x=Year, y=Count)) +
-  geom_boxplot(aes(group=Year)) +
-  theme_cowplot() + facet_wrap(~Species)
-
 ################################################################################
 #PRELIMINARY VISUALIZATIONS (FIGURE 2-3)
 ################################################################################
@@ -78,9 +69,13 @@ test2 <- test %>%
   filter(Species != "Wolfeel") %>%
   filter(Species != "Puget_Sound") #remove counts less than 2
 
+#Rename "Black" as "Black & Deacon" for figure
+conditions <- c("Black")
+replacement_values <- c("Black & Deacon")
+test2$Species <- replace(test2$Species, test2$Species %in% conditions, replacement_values)
+
 #plot at 1500x1000
-#Option 3- keep
-descending <- c("Black","Widow","Greenling","Yellowtail","Canary","China","Lingcod","Quillback","Copper","Cabezon","Tiger","Vermillion","Yelloweye")
+descending <- c("Black & Deacon","Widow","Yellowtail","Greenling","China","Canary","Lingcod","Quillback","Copper","Tiger","Cabezon","Vermillion","Yelloweye")
 
 ggplot(data=test2,aes(x=Year,y=Count)) +
   geom_point(size=2.5, alpha=0.5, aes(shape=Site,group=Site, fill=Site))+
@@ -91,6 +86,9 @@ ggplot(data=test2,aes(x=Year,y=Count)) +
   facet_wrap(~factor(Species, levels=descending), scales="free",nrow=3) +
   theme_cowplot() +
   theme(text = element_text(size = 20))
+
+#Housekeeping
+rm(test, test2, conditions, replacement_values, descending)
 
 ################################################################################
 #CHANGEPOINT ANALYSIS
@@ -119,23 +117,25 @@ dat.avg <- dat %>%
 
 #dat.avg[2:18] <- log_transform(dat.avg[2:18])
 
+#create total adult rockfish column
+dat.avg <- dat.avg %>%
+  select(-c(YOY,Cabezon,Greenling,Lingcod,Wolfeel,Halibut)) %>%
+  mutate(Rockfish=rowSums(.[2:12]))
+
 #TEST FOR NORMALITY-------------------------------------------------------------
 
 #1. visualize histograms
 data <- dat.avg %>%
-  pivot_longer(cols = c(2:18), names_to = "Species", values_to = "Avg")
+  pivot_longer(cols = c(2:13), names_to = "Species", values_to = "Avg")
 
 ggplot(data, aes(x=Avg, color=Species)) +
   geom_histogram(aes(fill=Species)) +
   facet_wrap(~Species) +
   scale_x_continuous(trans="log2")
 
-ggplot(RF.dat, aes(x=Avg)) +
-  geom_histogram()
-
 #2.visualize qq-plots
-qqnorm(data$Avg)
-qqline(data$Avg)
+qqnorm(dat.avg$Rockfish)
+qqline(dat.avg$Rockfish)
 
 qqnorm(dat.avg$Canary)
 qqline(dat.avg$Canary)
@@ -146,22 +146,23 @@ qqline(dat.avg$Copper)
 qqnorm(dat.avg$Quillback)
 qqline(dat.avg$Quillback)
 
-qqnorm(dat.avg$Vermilion)
-qqline(dat.avg$Vermilion)
+qqnorm(dat.avg$Tiger)
+qqline(dat.avg$Tiger)
+
+qqnorm(dat.avg$China)
+qqline(dat.avg$China)
 
 #qqnorm(RF.dat$Avg)
 #qqline(RF.dat$Avg)
 
 #3. Shapiro-Wilk normality test
 
-shapiro.test(data$Avg) #non-normal
+shapiro.test(dat.avg$Rockfish) #non-normal
 shapiro.test(dat.avg$Canary) #non-normal
 shapiro.test(dat.avg$China) #NORMAL
 shapiro.test(dat.avg$Copper) #non-normal
-shapiro.test(dat.avg$Greenling) #NORMAL
 shapiro.test(dat.avg$Quillback) #non-normal
 shapiro.test(dat.avg$Tiger) #non-normal
-shapiro.test(dat.avg$Yellowtail) #non-normal
 #shapiro.test(RF.dat$Avg) #normal
 
 #MAKE FUNCTIONS ---------------------------------------------------------------------
@@ -201,26 +202,21 @@ np.cpt <- function(col){
 ##DETERMINE CHANGEPOINTS--------------------------------------------------------
 
 #list of excluded species, where there is no clear changepoint or changepoint is at the beginning or end: 
-#Black(2), Cabezon(3), China(5), Greenling(7), Lingcod(8), Tiger(10), Widow(11),
-#Wolfeel(12), Yellowtail(13), YOY(14), Vermilion(15), Halibut(16), Yelloweye(17), Puget_Sound(18)
+#Black(2), Cabezon(3), Greenling(7), Lingcod(8), Widow(11), Wolfeel(12), Yellowtail(13), 
+#YOY(14), Vermilion(15), Halibut(16), Yelloweye(17), Puget_Sound(18)
 
-#cCanary <- conf.cpt(4) #cpt @6, conf 0.999
-#Canary <- change.pt(4, "Canary") #mean/var goes from 0/0 to 1.43/1.56 @6
-npCanary <- np.cpt(4) #cpt @9
+npRockfish <- np.cpt(13) #cpt @ 12 aka 2016
 
-#cCopper <- conf.cpt(6) #cpt @8, conf 0.987
-#Copper <- change.pt(6, "Copper") #mean/var goes from 0.09/0.01 to 0.81/0.38 @8
-npCopper <- np.cpt(6) #cpt @8
+npCanary <- np.cpt(3) #cpt @ 8 aka 2012
 
-#cQuillback <- conf.cpt(9) #cpt @4 conf 0.999
-#Quillback <- change.pt(9, "Quillback") #mean/var goes from 0/0 to 0.37/0.16 @4
-npQuillback <- np.cpt(9) #cpt @10
+npCopper <- np.cpt(5) #cpt @ 8 aka 2012
 
-cChina <- conf.cpt(5) 
-China <- change.pt(5, "China")
+npQuillback <- np.cpt(6) #cpt @ 10 aka 2014
 
-cGreenling <- conf.cpt(7) 
-Greenling <- change.pt(7, "Greenling")
+cChina <- conf.cpt(4) 
+China <- change.pt(4, "China") #cpt @ 17 aka 2022
+
+npTiger <- np.cpt(7) #cpt @ 15 aka 2019
 
 #commands to run through param.est(x), plot(x), summary(x)
 
@@ -233,7 +229,7 @@ Greenling <- change.pt(7, "Greenling")
 #ARF <- change.pt(19, "Avg")
 
 #HOUSEKEEPING
-rm(npCanary,npCopper,npQuillback,npVermilion,np.cpt)
+rm(npCanary,npCopper,npQuillback,npTiger,cChina, China, np.cpt, npRockfish,change.pt,conf.cpt)
 
 ################################################################################
 #VISUALIZE DATA
@@ -242,34 +238,47 @@ rm(npCanary,npCopper,npQuillback,npVermilion,np.cpt)
 #load necessary library
 library(ggpubr)
 
-#Create data tables with data for each species
+#Create data table with data for total adult rockfish
 Adata <- RF.long.dat %>%
+  group_by(Year,Site) %>%
+  mutate(Total=sum(Count)) %>%
+  select(-c(Species,Count)) %>%
+  unique()
+
+#Create data tables with data for each species
+Bdata <- RF.long.dat %>%
   filter(Species=="Copper")
 
-Bdata <- RF.long.dat %>%
+Cdata <- RF.long.dat %>%
   filter(Species == "Canary")
 
 Ddata <- RF.long.dat %>%
   filter(Species == "Quillback")
 
 Edata <- RF.long.dat %>%
-  filter(Species == "China")
-
-Fdata <- RF.long.dat %>%
   filter(Species == "Tiger")
 
+Fdata <- RF.long.dat %>%
+  filter(Species == "China")
+
 #Create individual plots
-A <- ggplot(data=Adata, aes(x=Year, y=Count)) +
+A <- ggplot(data=Adata, aes(x=Year, y=Total)) +
   geom_boxplot(aes(group=Year)) +
-  theme_cowplot() + ylab("No. copper") +
-  annotate("segment", x=2012, xend=2012, y=0, yend=4, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
+  theme_cowplot() + ylab("No. adult rockfish") +
+  annotate("segment", x=2016, xend=2016, y=0, yend=320, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
   ggtitle("(a)")
 
 B <- ggplot(data=Bdata, aes(x=Year, y=Count)) +
   geom_boxplot(aes(group=Year)) +
+  theme_cowplot() + ylab("No. copper") +
+  annotate("segment", x=2012, xend=2012, y=0, yend=4, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
+  ggtitle("(b)")
+
+C <- ggplot(data=Cdata, aes(x=Year, y=Count)) +
+  geom_boxplot(aes(group=Year)) +
   theme_cowplot() + ylab("No. canary") +
   annotate("segment", x=2012, xend=2012, y=0, yend=14, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
-  ggtitle("(b)")
+  ggtitle("(c)")
 
 D <-ggplot(data=Ddata, aes(x=Year, y=Count)) +
   geom_boxplot(aes(group=Year)) +
@@ -279,21 +288,21 @@ D <-ggplot(data=Ddata, aes(x=Year, y=Count)) +
 
 E <-ggplot(data=Edata, aes(x=Year, y=Count)) +
   geom_boxplot(aes(group=Year)) +
-  theme_cowplot() + ylab("No. china") +
-  annotate("segment", x=2021, xend=2021, y=0, yend=16, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
+  theme_cowplot() + ylab("No. tiger") +
+  annotate("segment", x=2019, xend=2019, y=0, yend=4, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
   ggtitle("(e)")
 
 F <-ggplot(data=Fdata, aes(x=Year, y=Count)) +
   geom_boxplot(aes(group=Year)) +
-  theme_cowplot() + ylab("No. tiger") +
-  annotate("segment", x=2019, xend=2019, y=0, yend=4, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
+  theme_cowplot() + ylab("No. china") +
+  annotate("segment", x=2022, xend=2022, y=0, yend=16, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
   ggtitle("(f)")
 
 #Create multipaneled plot
-ggarrange(A,B,D,E,F)
+ggarrange(A,B,C,D,E,F)
 
 #Housekeeping
-rm(A,Adata,B,Bdata,C,Cdata,D,Ddata)
+rm(A,Adata,B,Bdata,C,Cdata,D,Ddata,E,Edata,F,Fdata)
 
 ################################################################################
 #NON-PARAMETRIC MEANS COMPARISON PRE/POST CHANGEPOINT(S)
@@ -303,6 +312,26 @@ rm(A,Adata,B,Bdata,C,Cdata,D,Ddata)
 #1. Create pre/post vectors for analysis
 #2. Run Mann-Whitney test
 #Repeat for each species
+
+#TOTAL ADULT ROCKFISH-----------------------------------------------------------
+
+pre <- dat.avg %>%
+  pivot_longer(cols=c(2:13),names_to="Species", values_to="Count") %>% 
+  filter(Species=="Rockfish" & Year < 2016) %>%
+  pull(Count)
+
+#mean=43.43
+
+pos <- dat.avg %>%
+  pivot_longer(cols=c(2:13),names_to="Species", values_to="Count") %>% 
+  filter(Species=="Rockfish" & Year > 2016) %>%
+  pull(Count)
+
+#mean=74.48
+
+wilcox.test(pre,pos)
+
+#p-value=0.06157
 
 #COPPER ROCKFISH ---------------------------------------------------------------
 
