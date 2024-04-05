@@ -262,44 +262,44 @@ Fdata <- RF.long.dat %>%
   filter(Species == "China")
 
 #Create individual plots
-A <- ggplot(data=Adata, aes(x=Year, y=Total)) +
+F <- ggplot(data=Adata, aes(x=Year, y=Total)) +
   geom_boxplot(aes(group=Year)) +
   theme_cowplot() + ylab("No. adult rockfish") +
   annotate("segment", x=2016, xend=2016, y=0, yend=320, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
-  ggtitle("(a)")
+  ggtitle("(f)")
 
-B <- ggplot(data=Bdata, aes(x=Year, y=Count)) +
+A <- ggplot(data=Bdata, aes(x=Year, y=Count)) +
   geom_boxplot(aes(group=Year)) +
   theme_cowplot() + ylab("No. copper") +
   annotate("segment", x=2012, xend=2012, y=0, yend=4, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
-  ggtitle("(b)")
+  ggtitle("(a)")
 
-C <- ggplot(data=Cdata, aes(x=Year, y=Count)) +
+B <- ggplot(data=Cdata, aes(x=Year, y=Count)) +
   geom_boxplot(aes(group=Year)) +
   theme_cowplot() + ylab("No. canary") +
   annotate("segment", x=2012, xend=2012, y=0, yend=14, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
-  ggtitle("(c)")
+  ggtitle("(b)")
 
-D <-ggplot(data=Ddata, aes(x=Year, y=Count)) +
+C <-ggplot(data=Ddata, aes(x=Year, y=Count)) +
   geom_boxplot(aes(group=Year)) +
   theme_cowplot() + ylab("No. quillback") +
   annotate("segment", x=2014, xend=2014, y=0, yend=7, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
-  ggtitle("(d)")
+  ggtitle("(c)")
 
-E <-ggplot(data=Edata, aes(x=Year, y=Count)) +
+D <-ggplot(data=Edata, aes(x=Year, y=Count)) +
   geom_boxplot(aes(group=Year)) +
   theme_cowplot() + ylab("No. tiger") +
   annotate("segment", x=2019, xend=2019, y=0, yend=4, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
-  ggtitle("(e)")
+  ggtitle("(d)")
 
-F <-ggplot(data=Fdata, aes(x=Year, y=Count)) +
+E <-ggplot(data=Fdata, aes(x=Year, y=Count)) +
   geom_boxplot(aes(group=Year)) +
   theme_cowplot() + ylab("No. china") +
   annotate("segment", x=2022, xend=2022, y=0, yend=16, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
-  ggtitle("(f)")
+  ggtitle("(e)")
 
 #Create multipaneled plot
-ggarrange(A,B,C,D,E,F)
+ggarrange(A,B,C,D,E) #add F if you want to include panel of total adult rockfish
 
 #Housekeeping
 rm(A,Adata,B,Bdata,C,Cdata,D,Ddata,E,Edata,F,Fdata)
