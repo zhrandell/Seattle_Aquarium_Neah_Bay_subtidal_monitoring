@@ -48,7 +48,7 @@ dat$id <-seq(1:len)
 ## calculate total abundance 
 dat <- dat %>%
   rowwise(id) %>%
-  mutate(total=sum(c(Black, Cabezon, Canary, China, Copper, Greenling, Lingcod, 
+  mutate(total=sum(c(Black...Deacon, Cabezon, Canary, China, Copper, Greenling, Lingcod, 
                      Quillback, Tiger, Widow, Yellowtail, Vermillion, Yelloweye)))
 
 
@@ -65,7 +65,7 @@ S5 <- filter.site("5")
 ## long-form data structure for time series plots 
 long <- dat %>%
   gather("spp_name", "count",
-         Black, Cabezon, Canary, China, Copper, Greenling, Lingcod, 
+         Black...Deacon, Cabezon, Canary, China, Copper, Greenling, Lingcod, 
          Quillback, Tiger, Widow, Yellowtail, Vermillion, Yelloweye) %>%
   dplyr::arrange(desc(spp_name))
 ## END data wrangling ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -83,7 +83,7 @@ dat <- dat[, -c(23, 24)]
 dat.avg <- dat %>%
   group_by(Year) %>%
   summarise(across(
-    .cols = -c(1:7),
+    .cols = -c(1:8),
     .fns = list(avg=mean),
     .names = "{col}"))
 
