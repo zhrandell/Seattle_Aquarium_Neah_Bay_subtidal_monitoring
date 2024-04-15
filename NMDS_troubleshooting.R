@@ -4,8 +4,8 @@ library(vegan)
 
 #Step 2: import Neah_Bay_data csv and create dat frame -------------------------
 dat <- Neah_Bay_data
-dat <- dat %>% 
-  filter(Year < 2022) #use to recreate original figure, otherwise skip to include 2022-2023
+#dat <- dat %>% 
+ # filter(Year < 2022) #use to recreate original figure, otherwise skip to include 2022-2023
 
 #Step 3: tidy and filter data --------------------------------------------------
 dat <- dat[-1] ## remove first column, which codes for site location
