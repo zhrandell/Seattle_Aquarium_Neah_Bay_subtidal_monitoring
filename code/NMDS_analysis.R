@@ -3,7 +3,7 @@
 ## multivariate analyses community structure
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+#helpful reference site: https://jkzorz.github.io/2019/06/06/NMDS.html
 
 
 
