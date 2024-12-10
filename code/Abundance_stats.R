@@ -62,6 +62,16 @@ ggplot(data=test, aes(x=Year,y=Total,group=Site, fill=Site)) +
   theme_cowplot()+
   theme(legend.position="none")
 
+#Figure 2 with trend lines removed (not statistically robust, so potentially misleading in manuscript)
+ggplot(data=test, aes(x=Year,y=Total,group=Site, fill=Site)) +
+  geom_point(size=2, alpha=0.5, aes(shape=Site)) +
+  scale_shape_manual(values=c(21,22,23,24,25))+
+  scale_fill_manual(values=c("#E69F00", "#56B4E9","#009E73","#F0E442","#CC79A7"))+
+  facet_wrap(~Site) +
+  ylab("Total adult fish")+
+  theme_cowplot()+
+  theme(legend.position="none")
+
 #Figure 3
 test2 <- test %>%
   drop_na() %>%
@@ -74,12 +84,22 @@ conditions <- c("Black")
 replacement_values <- c("Black & Deacon")
 test2$Species <- replace(test2$Species, test2$Species %in% conditions, replacement_values)
 
-#plot at 1500x1000
+#plot at 1500x800
 descending <- c("Black & Deacon","Widow","Yellowtail","Greenling","China","Canary","Lingcod","Quillback","Copper","Tiger","Cabezon","Vermillion","Yelloweye")
 
 ggplot(data=test2,aes(x=Year,y=Count)) +
   geom_point(size=2.5, alpha=0.5, aes(shape=Site,group=Site, fill=Site))+
   geom_smooth(method="lm",se=FALSE, linewidth=0.75, color="gray25")+
+  scale_shape_manual(values=c(21,22,23,24,25))+
+  scale_fill_manual(values=c("#E69F00", "#56B4E9","#009E73","#F0E442","#CC79A7"))+
+  scale_color_manual(values=c("#E69F00", "#56B4E9","#009E73","#F0E442","#CC79A7"))+
+  facet_wrap(~factor(Species, levels=descending), scales="free",nrow=3) +
+  theme_cowplot() +
+  theme(text = element_text(size = 20))
+
+#Plot with trendline removed
+ggplot(data=test2,aes(x=Year,y=Count)) +
+  geom_point(size=2.5, alpha=0.5, aes(shape=Site,group=Site, fill=Site))+
   scale_shape_manual(values=c(21,22,23,24,25))+
   scale_fill_manual(values=c("#E69F00", "#56B4E9","#009E73","#F0E442","#CC79A7"))+
   scale_color_manual(values=c("#E69F00", "#56B4E9","#009E73","#F0E442","#CC79A7"))+
