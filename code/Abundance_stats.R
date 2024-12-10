@@ -294,9 +294,21 @@ A <- ggplot(data=Bdata, aes(x=Year, y=Count)) +
   annotate("segment", x=2012, xend=2012, y=0, yend=4, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
   ggtitle("(a)")
 
+Ad <-  ggplot(data=Bdata, aes(x=Year, y=Count)) +
+  geom_point(aes(group=Year, size=3, alpha=0.25)) +
+  theme_cowplot() + ylab("No. copper") + theme(legend.position = "none") +
+  annotate("segment", x=2012, xend=2012, y=0, yend=4, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
+  ggtitle("(a)") #d options are scatterplots rather than boxplots
+
 B <- ggplot(data=Cdata, aes(x=Year, y=Count)) +
   geom_boxplot(aes(group=Year)) +
   theme_cowplot() + ylab("No. canary") +
+  annotate("segment", x=2012, xend=2012, y=0, yend=14, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
+  ggtitle("(b)")
+
+Bd <- ggplot(data=Cdata, aes(x=Year, y=Count)) +
+  geom_point(aes(group=Year, size = 3, alpha=0.25)) +
+  theme_cowplot() + ylab("No. canary") + theme(legend.position = "none") +
   annotate("segment", x=2012, xend=2012, y=0, yend=14, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
   ggtitle("(b)")
 
@@ -306,9 +318,21 @@ C <-ggplot(data=Ddata, aes(x=Year, y=Count)) +
   annotate("segment", x=2014, xend=2014, y=0, yend=7, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
   ggtitle("(c)")
 
+Cd <-ggplot(data=Ddata, aes(x=Year, y=Count)) +
+  geom_point(aes(group=Year, size=3, alpha=0.25)) +
+  theme_cowplot() + ylab("No. quillback") + theme(legend.position = "none") +
+  annotate("segment", x=2014, xend=2014, y=0, yend=7, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
+  ggtitle("(c)")
+
 D <-ggplot(data=Edata, aes(x=Year, y=Count)) +
   geom_boxplot(aes(group=Year)) +
   theme_cowplot() + ylab("No. tiger") +
+  annotate("segment", x=2019, xend=2019, y=0, yend=4, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
+  ggtitle("(d)")
+
+Dd <-ggplot(data=Edata, aes(x=Year, y=Count)) +
+  geom_point(aes(group=Year, size=3, alpha=0.25)) +
+  theme_cowplot() + ylab("No. tiger") + theme(legend.position = "none") +
   annotate("segment", x=2019, xend=2019, y=0, yend=4, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
   ggtitle("(d)")
 
@@ -318,8 +342,14 @@ E <-ggplot(data=Fdata, aes(x=Year, y=Count)) +
   annotate("segment", x=2022, xend=2022, y=0, yend=16, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
   ggtitle("(e)")
 
-#Create multipaneled plot
-ggarrange(A,B,C,D,E) #add F if you want to include panel of total adult rockfish
+Ed <-ggplot(data=Fdata, aes(x=Year, y=Count)) +
+  geom_point(aes(group=Year, size=3, alpha=0.25)) +
+  theme_cowplot() + ylab("No. china") + theme(legend.position = "none") +
+  annotate("segment", x=2022, xend=2022, y=0, yend=16, color="red", linewidth=1.5, linetype="dashed", alpha=0.5) +
+  ggtitle("(e)")
+
+#Create multipaneled plot - dimensions 1000x650
+ggarrange(Ad,Bd,Cd,Dd,Ed) #add F if you want to include panel of total adult rockfish
 
 #Housekeeping
 rm(A,Adata,B,Bdata,C,Cdata,D,Ddata,E,Edata,F,Fdata)
