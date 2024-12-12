@@ -199,3 +199,5 @@ ytail <- dat[which(dat$Species=="yellowtail rockfish"),]
 cor.ytail <- cor.test(ytail$SEAQ_Count, ytail$RecFin_Count, method="kendall")
 print(cor.ytail)
 rm(ytail)
+
+#test
