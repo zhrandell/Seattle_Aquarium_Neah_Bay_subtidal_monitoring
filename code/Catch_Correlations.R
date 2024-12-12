@@ -15,12 +15,16 @@ library(data.table)
 library(ggplot2)
 library(ggpubr)
 library(cowplot)
+library(here)
+library("lme4")
+library("EnvStats")
+library("ggeffects")
+library("ggthemes")
 
 #Load data files
-setwd("C:/Users/shelledyk/OneDrive - Seattle Aquarium/Documents/NeahBay/Seattle_Aquarium_Neah_Bay_subtidal_monitoring/data_input")
+marine.dat <- read_csv(here("./data_input/Neah_Bay_data.csv"))
+landings.dat <- read_csv(here("./data_input/RecFIN_landings_2000to2022.csv"))
 
-marine.dat <- read_csv("Neah_Bay_data.csv")
-landings.dat <- read_csv("RecFIN_landings_2000to2022.csv")
 
 #tweak databases so their formatting is ready for merging
 landings.dat$Species <- tolower(landings.dat$Species)
@@ -72,6 +76,36 @@ ggplot(dat, aes(x=SEAQ_Count, y=RecFin_Count)) +
   scale_y_continuous(trans="log2") + scale_x_continuous(trans="log2") +
   annotate("text", x=500, y=18, label="Tau=0.398  ")+
   annotate("text", x=500, y=10, label="p=2.2e-16**") #p=2.2e-16, tau=0.392 #https://www.statology.org/add-text-to-ggplot/#:~:text=You%20can%20use%20the%20annotate,text%20to%20plots%20in%20ggplot2.&text=where%3A,label%3A%20The%20text%20to%20display.
+
+#import bag limit data and merge with other data frame
+bag.lim <- read_csv(here("./data_input/bag_limits.csv"))
+setnames(bag.lim, skip_absent = TRUE, 
+         old = c("date", "bag limits"), 
+         new = c("Year", "bag_lim"))
+datv2 <- merge(dat, bag.lim, by = c("Year"))
+
+#generalized linear mixed effects model with rec fin count as response, sea aquarium counts as predictor, and bag limit and year as random effects
+#negative binomial - for count data that is over dispersed (variance > mean)
+mod1 <- glmer.nb(RecFin_Count ~ SEAQ_Count + (1|bag_lim) + (1|Year), data = datv2)
+summary(mod1)
+
+#check model fit/diagnostics
+hist(residuals(mod1))
+plot(residuals(mod1))
+qqPlot(residuals(mod1))
+
+#create predicted value using the model
+count_pred <- as.data.frame(ggpredict(mod1, terms = c("SEAQ_Count"), interval = "confidence"))
+
+#plot data, prediction line, and confidence interval
+ggplot(count_pred, aes(x = x, y = predicted)) +
+  geom_line(color = "blue", size = 0.8) +  # Line plot of predicted values 
+  geom_point(data = datv2, aes(x = SEAQ_Count, y = RecFin_Count), size = 2)  + # add data points
+  geom_ribbon(data = count_pred, aes(x = x, ymin = conf.low, ymax = conf.high), alpha = 0.3, fill = "blue") +# add CI
+  theme_few() +
+  xlab("Dive survey counts") + ylab("Creel landings") +
+  annotate("text", x=250, y=3000, label="z = 153.83", size = 4)+
+  annotate("text", x=250, y=2800, label="p < 0.001", size = 4)
 
 time.dat <- dat %>%
   pivot_longer("RecFin_Count":"SEAQ_Count", names_to = "Method", values_to = "Count")
