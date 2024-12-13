@@ -14,10 +14,15 @@
 library(tidyverse)
 library(ggplot2)
 library(cowplot)
+library(lme4)
+library(ggthemes)
+library(lsmeans)
+library(here)
+library(EnvStats)
+library(ggeffects)
 
 #Load data
-setwd("C:/Users/shelledyk/OneDrive - Seattle Aquarium/Documents/NeahBay/Seattle_Aquarium_Neah_Bay_subtidal_monitoring")
-dat <- read_csv("data_input/Neah_Bay_data.csv")
+dat <- read_csv(here("./data_input/Neah_Bay_data.csv"))
 
 #Tidy data
 dat <- dat %>% 
@@ -27,6 +32,7 @@ dat <- dat %>%
 long.dat <- dat %>% 
   pivot_longer(cols = c(3:19), names_to = "Species", values_to = "Count")
 
+#remove non-rockfish and create database with just rockfish, including a column with total and average totals
 RF.dat <- dat %>%
   select(-c(Cabezon, Greenling, Halibut, Lingcod, Wolfeel, YOY)) %>%
   rowwise() %>%
@@ -35,8 +41,8 @@ RF.dat <- dat %>%
   ungroup() %>%
   group_by(Year) %>%
   mutate(Avg = mean(Total)) %>%
-  select(c(Year, Avg)) %>%
-  unique() #create database with just rockfish, including a column with total and average totals
+  select(c(Year, Total, Avg)) %>%
+  unique() 
 
 RF.long.dat <- long.dat %>%
   filter(Species %in% c("Black", "Canary", "China", "Copper", "Puget_Sound", 
@@ -109,6 +115,73 @@ ggplot(data=test2,aes(x=Year,y=Count)) +
 
 #Housekeeping
 rm(test, test2, conditions, replacement_values, descending)
+
+
+#format columns
+cols_fac <- as.vector(colnames(RF.long.dat)[c(2, 3)]) #select columns that are factors
+RF.long.dat[cols_fac] <- lapply(RF.long.dat[cols_fac], factor) #turn those columns into factors
+cols_num <- as.vector(colnames(RF.long.dat)[c(1,4)]) #select columns that are numeric
+RF.long.dat[cols_num] <- lapply(RF.long.dat[cols_num], as.numeric) #turn those columns into numeric
+
+#sum number of observaitons of each species (trying to decide what species to remove because too few data)
+RF.long.dat %>% 
+  group_by(Species) %>%
+  summarise(
+    Total = sum(Count)
+  )
+
+#make a histogram of the counts for each species (trying to decide what species to remove because too few data)
+ggplot(RF.long.dat, aes(x = Count, fill = Species)) +
+  geom_histogram(binwidth = 1, alpha = 0.6, position = "identity") +  # Customize binwidth as needed
+  facet_wrap(~ Species, scales = "free") +  # Create a separate plot for each species
+  theme_minimal() 
+
+#remove puget sound, vermillion, and yelloweye
+RF.long.dat.filt <- RF.long.dat %>%
+  filter(!(Species %in% c("Puget_Sound", "Vermillion", "Yelloweye", "Widow")))
+
+#create models (with and without interaction)
+mod1 <- glmer.nb(Count ~ Year * Species + (1|Site), data = RF.long.dat.filt) 
+summary(mod1)
+mod2 <- glmer.nb(Count ~ Year + Species + (1|Site), data = RF.long.dat.filt) 
+summary(mod2)
+
+#test interaction
+anova(mod1, mod2)
+
+#check model fit/diagnostics
+hist(residuals(mod1))
+plot(residuals(mod1))
+qqPlot(residuals(mod1))
+
+#pairwise comparisons between slopes
+lstrends(mod1, pairwise ~ Species, var = "Year", adjust = "tukey")
+
+#create predicted value using the model
+count_pred <- as.data.frame(ggpredict(mod1, terms = c("Year", "Species"), interval = "confidence"))
+colnames(count_pred)[6] <- "Species"
+
+#plot data, prediction line, and confidence interval 
+ggplot(count_pred, aes(x = x, y = predicted)) +
+  geom_line(aes(fill = Species), color = "black") + # Line plot of predicted values 
+  geom_ribbon(data = count_pred, aes(x = x, ymin = conf.low, ymax = conf.high, fill = Species), fill = "blue", alpha = 0.3) +# add CI
+  geom_point(data = RF.long.dat.filt, aes(x = Year, y = Count, fill = Species), size = 2) +
+  theme_few() +
+  facet_wrap(~Species, scales = "free", ncol = 2) +
+  theme(legend.position = "none")
+  
+  
+  
+  theme(panel.border = element_rect(linewidth = 1.5, colour = "black")) +
+  xlab("% Hard Coral Cover") +
+  ylab(y_lab) +
+  scale_fill_manual("Bite Mark Category", values = colors, labels = categs) +
+  scale_color_manual("Bite Mark Category", values = colors, labels = categs) +
+  theme(panel.border = element_rect(linewidth = 1.5, colour = "black")) +
+  theme(plot.title = element_text(size = 12, face = "bold")) +
+  theme(legend.text.align = 0) +
+  scale_x_continuous(breaks = x_axis_breaks, labels = x_axis_labs)
+
 
 ################################################################################
 #CHANGEPOINT ANALYSIS
