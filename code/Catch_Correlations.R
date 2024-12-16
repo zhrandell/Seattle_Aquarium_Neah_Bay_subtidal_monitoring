@@ -16,10 +16,10 @@ library(ggplot2)
 library(ggpubr)
 library(cowplot)
 library(here)
-library("lme4")
-library("EnvStats")
-library("ggeffects")
-library("ggthemes")
+library(lme4)
+library(EnvStats)
+library(ggeffects)
+library(ggthemes)
 
 #Load data files
 marine.dat <- read_csv(here("./data_input/Neah_Bay_data.csv"))
@@ -105,7 +105,12 @@ ggplot(count_pred, aes(x = x, y = predicted)) +
   theme_few() +
   xlab("Dive survey counts") + ylab("Creel landings") +
   annotate("text", x=250, y=3000, label="z = 153.83", size = 4)+
-  annotate("text", x=250, y=2800, label="p < 0.001", size = 4)
+  annotate("text", x=250, y=2800, label="p < 0.001", size = 4) +
+  scale_x_continuous(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0))
+
+ggsave("Figure_7_with_model_predictions.png", plot = last_plot(),
+       path = here("./figures"))
 
 time.dat <- dat %>%
   pivot_longer("RecFin_Count":"SEAQ_Count", names_to = "Method", values_to = "Count")
