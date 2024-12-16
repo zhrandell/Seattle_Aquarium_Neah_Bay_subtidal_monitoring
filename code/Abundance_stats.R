@@ -20,6 +20,7 @@ library(lsmeans)
 library(here)
 library(EnvStats)
 library(ggeffects)
+library(ggh4x)
 
 #Load data
 dat <- read_csv(here("./data_input/Neah_Bay_data.csv"))
@@ -123,7 +124,7 @@ RF.long.dat[cols_fac] <- lapply(RF.long.dat[cols_fac], factor) #turn those colum
 cols_num <- as.vector(colnames(RF.long.dat)[c(1,4)]) #select columns that are numeric
 RF.long.dat[cols_num] <- lapply(RF.long.dat[cols_num], as.numeric) #turn those columns into numeric
 
-#sum number of observaitons of each species (trying to decide what species to remove because too few data)
+#sum number of observations of each species (trying to decide what species to remove because too few data)
 RF.long.dat %>% 
   group_by(Species) %>%
   summarise(
@@ -140,10 +141,13 @@ ggplot(RF.long.dat, aes(x = Count, fill = Species)) +
 RF.long.dat.filt <- RF.long.dat %>%
   filter(!(Species %in% c("Puget_Sound", "Vermillion", "Yelloweye", "Widow")))
 
+#change Black to Black and Deacon for plot
+levels(RF.long.dat.filt$Species)[levels(RF.long.dat.filt$Species) == "Black"] <- "Black and Deacon"
+
 #create models (with and without interaction)
-mod1 <- glmer.nb(Count ~ Year * Species + (1|Site), data = RF.long.dat.filt) 
+mod1 <- glmer(Count ~ Year * Species + (1|Site), family = "poisson", data = RF.long.dat.filt) 
 summary(mod1)
-mod2 <- glmer.nb(Count ~ Year + Species + (1|Site), data = RF.long.dat.filt) 
+mod2 <- glmer(Count ~ Year + Species + (1|Site), family = "poisson", data = RF.long.dat.filt) 
 summary(mod2)
 
 #test interaction
@@ -162,26 +166,35 @@ count_pred <- as.data.frame(ggpredict(mod1, terms = c("Year", "Species"), interv
 colnames(count_pred)[6] <- "Species"
 
 #plot data, prediction line, and confidence interval 
-ggplot(count_pred, aes(x = x, y = predicted)) +
-  geom_line(aes(fill = Species), color = "black") + # Line plot of predicted values 
-  geom_ribbon(data = count_pred, aes(x = x, ymin = conf.low, ymax = conf.high, fill = Species), fill = "blue", alpha = 0.3) +# add CI
-  geom_point(data = RF.long.dat.filt, aes(x = Year, y = Count, fill = Species), size = 2) +
-  theme_few() +
+fig3_base <- ggplot(count_pred, aes(x = x, y = predicted)) +
+  geom_line() + # Line plot of predicted values 
+  geom_ribbon(data = count_pred, aes(x = x, ymin = conf.low, ymax = conf.high), fill = "blue", alpha = 0.3) +# add CI
+  geom_point(data = RF.long.dat.filt, aes(x = Year, y = Count, shape=Site,group=Site, fill=Site), size = 2) +
   facet_wrap(~Species, scales = "free", ncol = 2) +
-  theme(legend.position = "none")
-  
-  
-  
-  theme(panel.border = element_rect(linewidth = 1.5, colour = "black")) +
-  xlab("% Hard Coral Cover") +
-  ylab(y_lab) +
-  scale_fill_manual("Bite Mark Category", values = colors, labels = categs) +
-  scale_color_manual("Bite Mark Category", values = colors, labels = categs) +
-  theme(panel.border = element_rect(linewidth = 1.5, colour = "black")) +
-  theme(plot.title = element_text(size = 12, face = "bold")) +
-  theme(legend.text.align = 0) +
-  scale_x_continuous(breaks = x_axis_breaks, labels = x_axis_labs)
+  scale_shape_manual(values=c(21,22,23,24,25),
+                     labels = c("Site 1", "Site 2", "Site 3", "Site 4", "Site 5")) +
+  scale_fill_manual(values=c("#E69F00", "#56B4E9","#009E73","#F0E442","#CC79A7"),
+                    labels = c("Site 1", "Site 2", "Site 3", "Site 4", "Site 5"))+
+  theme_cowplot() +
+  theme(legend.position = "right") +
+  xlab("Year") +
+  ylab("Count") +
+  scale_x_continuous(limits = c(2005, 2024)) 
 
+#center the plot on the bottom row
+design <- c(
+  "
+  AABB
+  CCDD
+  EEFF
+  #GG#
+  "
+)
+
+fig3_base + facet_manual(~Species, design = design, scales = "free")
+
+ggsave("Figure_3_With_Model_predictions.png", plot = last_plot(), 
+       path = here("./figures"))
 
 ################################################################################
 #CHANGEPOINT ANALYSIS
