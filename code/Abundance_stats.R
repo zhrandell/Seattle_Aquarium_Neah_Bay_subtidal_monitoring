@@ -24,6 +24,7 @@ library(ggh4x)
 library(glmmTMB)
 library(DHARMa)
 library(MASS)
+library(dplyr)
 
 #Load data
 dat <- read_csv(here("./data_input/Neah_Bay_data.csv"))
@@ -31,21 +32,21 @@ dat <- read_csv(here("./data_input/Neah_Bay_data.csv"))
 #Tidy data
 dat <- dat %>% 
   filter(Transect=="T1") %>%
-  select(-c(Direction, Location, Transect))
+  dplyr::select(-c(Direction, Location, Transect))
 
 long.dat <- dat %>% 
   pivot_longer(cols = c(3:19), names_to = "Species", values_to = "Count")
 
 #remove non-rockfish and create database with just rockfish, including a column with total and average totals
 RF.dat <- dat %>%
-  select(-c(Cabezon, Greenling, Halibut, Lingcod, Wolfeel, YOY)) %>%
+  dplyr::select(-c(Cabezon, Greenling, Halibut, Lingcod, Wolfeel, YOY)) %>%
   rowwise() %>%
   mutate(Total = sum(c(Black, Canary, China, Copper, Puget_Sound, Quillback, 
                        Tiger, Vermillion, Widow, Yelloweye, Yellowtail))) %>%
   ungroup() %>%
   group_by(Year) %>%
   mutate(Avg = mean(Total)) %>%
-  select(c(Year, Total, Avg)) %>%
+  dplyr::select(c(Year, Total, Avg)) %>%
   unique() 
 
 RF.long.dat <- long.dat %>%
@@ -175,7 +176,7 @@ black.mod2 <- glm.nb(Count ~ 1 , data = black)
 #test whether year is a significant predictor
 p <- c(anova(black.mod1, black.mod2)[2,8])
 LRT <- c(anova(black.mod1, black.mod2)[2,7])
-spp <- c("black")
+Species <- c("black")
 
 #check model fit
 hist(residuals(black.mod1))
@@ -195,7 +196,7 @@ canary.mod2 <- glm.nb(Count ~ 1, data = canary)
 #test whether year is a significant predictor
 p <- c(p, anova(canary.mod1, canary.mod2)[2,8])
 LRT <- c(LRT, anova(canary.mod1, canary.mod2)[2,7])
-spp <- c(spp, "canary")
+Species <- c(Species, "canary")
 
 #check model fit
 hist(residuals(canary.mod1))
@@ -215,7 +216,7 @@ china.mod2 <- glm.nb(Count ~ 1, data = china)
 #test whether year is a significant predictor
 p <- c(p, anova(china.mod1, china.mod2)[2,8])
 LRT <- c(LRT, anova(china.mod1, china.mod2)[2,7])
-spp <- c(spp, "china")
+Species <- c(Species, "china")
 
 #check model fit
 hist(residuals(china.mod1))
@@ -235,7 +236,7 @@ copper.mod2 <- glm.nb(Count ~ 1, data = copper)
 #test whether year is a significant predictor
 p <- c(p, anova(copper.mod1, copper.mod2)[2,8])
 LRT <- c(LRT, anova(copper.mod1, copper.mod2)[2,7])
-spp <- c(spp, "copper")
+Species <- c(Species, "copper")
 
 #check model fit
 hist(residuals(copper.mod1))
@@ -256,7 +257,7 @@ quillback.mod2 <- glm.nb(Count ~ 1, data = quillback)
 #test whether year is a significant predictor
 p <- c(p, anova(quillback.mod1, quillback.mod2)[2,8])
 LRT <- c(LRT, anova(quillback.mod1, quillback.mod2)[2,7])
-spp <- c(spp, "quillback")
+Species <- c(Species, "quillback")
 
 #check model fit
 hist(residuals(quillback.mod1))
@@ -277,7 +278,7 @@ tiger.mod2 <- glm.nb(Count ~ 1, data = tiger)
 #test whether year is a significant predictor
 p <- c(p, anova(tiger.mod1, tiger.mod2)[2,8])
 LRT <- c(LRT, anova(tiger.mod1, tiger.mod2)[2,7])
-spp <- c(spp, "tiger")
+Species <- c(Species, "tiger")
 
 #check model fit
 hist(residuals(tiger.mod1))
@@ -298,7 +299,7 @@ yellowtail.mod2 <- glm.nb(Count ~ 1, data = yellowtail)
 #test whether year is a significant predictor
 p <- c(p, anova(yellowtail.mod1, yellowtail.mod2)[2,8])
 LRT <- c(LRT, anova(yellowtail.mod1, yellowtail.mod2)[2,7])
-spp <- c(spp, "yellowtail")
+Species <- c(Species, "yellowtail")
 
 #check model fit
 hist(residuals(yellowtail.mod1))
@@ -313,16 +314,20 @@ colnames(count_pred)[6] <- "Species"
 
 #p values to add to graphs
 LRT <- round(LRT, 2)
-p.vals <- as.data.frame(cbind(spp, p, LRT))
+p.vals <- as.data.frame(cbind(Species, p, LRT))
 p.vals$p <- c("p = 0.02", "p = 0.01", "p < 0.001", "p < 0.01", "p < 0.001", "p = 0.02", "p = 0.02")
 p.vals$LRT <- paste("LRT = ", p.vals$LRT)
+p.vals$x <- 2008
+p.vals$y.p.val <- c(300, 13, 15, 3.5, 6, 3.5, 22.5)
+p.vals$Species <- str_to_title(p.vals$Species)
+p.vals$Species <- as.factor(p.vals$Species)
+levels(p.vals$Species)[levels(p.vals$Species) == "Black"] <- "Black and Deacon"
 
 #plot data, prediction line, and confidence interval 
 fig3_base <- ggplot(count_pred, aes(x = x, y = predicted)) +
   geom_line() + # Line plot of predicted values 
   geom_ribbon(data = count_pred, aes(x = x, ymin = conf.low, ymax = conf.high), fill = "blue", alpha = 0.3) +# add CI
   geom_point(data = RF.long.dat.filt, aes(x = Year, y = Count, shape=Site,group=Site, fill=Site), size = 2) +
-  facet_wrap(~Species, scales = "free", ncol = 2) +
   scale_shape_manual(values=c(21,22,23,24,25),
                      labels = c("Site 1", "Site 2", "Site 3", "Site 4", "Site 5")) +
   scale_fill_manual(values=c("#E69F00", "#56B4E9","#009E73","#F0E442","#CC79A7"),
@@ -331,8 +336,14 @@ fig3_base <- ggplot(count_pred, aes(x = x, y = predicted)) +
   theme(legend.position = "right") +
   xlab("Year") +
   ylab("Count") +
-  scale_x_continuous(limits = c(2005, 2024)) 
-
+  scale_x_continuous(limits = c(2005, 2024)) +
+  geom_text(data = p.vals, (aes(x = x, -Inf, label = p)),
+            col = "black",
+            vjust = -7.75) +
+  geom_text(data = p.vals, (aes(x = x, -Inf, label = LRT)),
+            col = "black",
+            vjust = -6.5) +
+  facet_wrap(~Species, scales = "free", ncol = 2) 
 
 #center the plot on the bottom row
 design <- c(
@@ -435,9 +446,9 @@ conf.cpt <- function(col){
 }
 
 ##function to generate meanvar plots
-change.pt <- function(col, spp){
+change.pt <- function(col, Species){
   t1 <- dat.avg[, c(1, col)]
-  t2 <- t1 %>% spread(Year, spp)
+  t2 <- t1 %>% spread(Year, Species)
   t3 <- as.numeric(t2)
   out <- cpt.meanvar(t3, Q=5)
   return(out)
@@ -741,9 +752,9 @@ dat.avg <- dat %>%
     .names = "{col}"))
 
 ## function to format data for changepoint 
-change.pt <- function(col, spp){
+change.pt <- function(col, Species){
   t1 <- dat.avg[, c(1, col)]
-  t2 <- t1 %>% spread(Year, spp)
+  t2 <- t1 %>% spread(Year, Species)
   t3 <- as.numeric(t2)
   out <- cpt.meanvar(t3, Q=5)
   return(out)
@@ -768,15 +779,15 @@ Yelloweye <- change.pt(17, "Yelloweye")
 Puget_Sound <- change.pt(18, "Puget_Sound")
 
 ## plot changepoints 
-plot.changepts <- function(spp, full_spp, title){
+plot.changepts <- function(Species, full_Species, title){
   offset <- 0.003
   zero <- 2010
-  x1 <- spp@cpts[[1]]
-  x2 <- spp@cpts[[2]]
-  y1 <- spp@param.est[["mean"]][1]
-  y2 <- spp@param.est[["mean"]][2]
+  x1 <- Species@cpts[[1]]
+  x2 <- Species@cpts[[2]]
+  y1 <- Species@param.est[["mean"]][1]
+  y2 <- Species@param.est[["mean"]][2]
   
-  p1 <- ggplot(dat.avg, aes(Year, full_spp)) + geom_path() + geom_point() + my.theme + x.lab + x.breaks +
+  p1 <- ggplot(dat.avg, aes(Year, full_Species)) + geom_path() + geom_point() + my.theme + x.lab + x.breaks +
     geom_rect(data=dat.avg, aes(xmin=zero, xmax=zero+x1, ymin=y1-offset, ymax=y1+offset), color="red", fill="red") +
     geom_rect(data=dat.avg, aes(xmin=zero+x1, xmax=zero+x2, ymin=y2-offset, ymax=y2+offset), color="red", fill="red") +
     theme(axis.title.x=element_blank()) + ylab("Site averaged abundance") + ggtitle(title)
