@@ -20,6 +20,7 @@ library(lme4)
 library(EnvStats)
 library(ggeffects)
 library(ggthemes)
+library(dplyr)
 
 #Load data files
 marine.dat <- read_csv(here("./data_input/Neah_Bay_data.csv"))
@@ -42,7 +43,7 @@ setnames(marine.dat, skip_absent = TRUE,
 
 #make marine.dat tidy
 marine.dat <- marine.dat %>%
-  select(-"YOY") %>%
+  dplyr::select(-"YOY") %>%
   pivot_longer("black rockfish":"puget sound rockfish", names_to = "Species", values_to = "Count")
 marine.dat$Species <- tolower(marine.dat$Species)
 
@@ -103,7 +104,7 @@ ggplot(count_pred, aes(x = x, y = predicted)) +
   geom_point(data = datv2, aes(x = SEAQ_Count, y = RecFin_Count), size = 2)  + # add data points
   geom_ribbon(data = count_pred, aes(x = x, ymin = conf.low, ymax = conf.high), alpha = 0.3, fill = "blue") +# add CI
   theme_few() +
-  xlab("Dive survey counts") + ylab("Creel landings") +
+  xlab("Dive survey counts") + ylab("RecFIN counts") +
   annotate("text", x=250, y=3000, label="z = 153.83", size = 4)+
   annotate("text", x=250, y=2800, label="p < 0.001", size = 4) +
   scale_x_continuous(expand = c(0,0)) +
