@@ -21,6 +21,9 @@ library(here)
 library(EnvStats)
 library(ggeffects)
 library(ggh4x)
+library(glmmTMB)
+library(DHARMa)
+library(MASS)
 
 #Load data
 dat <- read_csv(here("./data_input/Neah_Bay_data.csv"))
@@ -137,7 +140,7 @@ ggplot(RF.long.dat, aes(x = Count, fill = Species)) +
   facet_wrap(~ Species, scales = "free") +  # Create a separate plot for each species
   theme_minimal() 
 
-#remove puget sound, vermillion, and yelloweye
+#remove puget sound, vermillion,  yelloweye, widow
 RF.long.dat.filt <- RF.long.dat %>%
   filter(!(Species %in% c("Puget_Sound", "Vermillion", "Yelloweye", "Widow")))
 
@@ -145,9 +148,9 @@ RF.long.dat.filt <- RF.long.dat %>%
 levels(RF.long.dat.filt$Species)[levels(RF.long.dat.filt$Species) == "Black"] <- "Black and Deacon"
 
 #create models (with and without interaction)
-mod1 <- glmer(Count ~ Year * Species + (1|Site), family = "poisson", data = RF.long.dat.filt) 
+mod1 <- glmmTMB(Count ~ Year * Species + (1|Site), family = "nbinom2", data = RF.long.dat.filt) 
 summary(mod1)
-mod2 <- glmer(Count ~ Year + Species + (1|Site), family = "poisson", data = RF.long.dat.filt) 
+mod2 <- glmmTMB(Count ~ Year + Species + (1|Site), family = "nbinom2", data = RF.long.dat.filt) 
 summary(mod2)
 
 #test interaction
@@ -156,14 +159,163 @@ anova(mod1, mod2)
 #check model fit/diagnostics
 hist(residuals(mod1))
 plot(residuals(mod1))
-qqPlot(residuals(mod1))
+resids <- simulateResiduals(mod1)
+plot(resids)
 
-#pairwise comparisons between slopes
-lstrends(mod1, pairwise ~ Species, var = "Year", adjust = "tukey")
+#because year x species interaction was significant, build a model for each species to determine whether species is a significant predictor for each one
+#black & deacon
+#filter data
+black <- RF.long.dat.filt %>%
+  filter(Species %in% "Black and Deacon")
 
-#create predicted value using the model
+#build model with and without predictor
+black.mod1 <- glm.nb(Count ~ Year, data = black)
+black.mod2 <- glm.nb(Count ~ 1 , data = black)
+
+#test whether year is a significant predictor
+p <- c(anova(black.mod1, black.mod2)[2,8])
+LRT <- c(anova(black.mod1, black.mod2)[2,7])
+spp <- c("black")
+
+#check model fit
+hist(residuals(black.mod1))
+plot(residuals(black.mod1))
+resids <- simulateResiduals(black.mod1)
+plot(resids)
+
+#canary
+#filter data
+canary <- RF.long.dat.filt %>%
+  filter(Species %in% "Canary")
+
+#build model with and without predictor
+canary.mod1 <- glm.nb(Count ~ Year, data = canary)
+canary.mod2 <- glm.nb(Count ~ 1, data = canary)
+
+#test whether year is a significant predictor
+p <- c(p, anova(canary.mod1, canary.mod2)[2,8])
+LRT <- c(LRT, anova(canary.mod1, canary.mod2)[2,7])
+spp <- c(spp, "canary")
+
+#check model fit
+hist(residuals(canary.mod1))
+plot(residuals(canary.mod1))
+resids <- simulateResiduals(canary.mod1)
+plot(resids)
+
+#china
+#filter data
+china <- RF.long.dat.filt %>%
+  filter(Species %in% "China")
+
+#build model with and without predictor
+china.mod1 <- glm.nb(Count ~ Year, data = china)
+china.mod2 <- glm.nb(Count ~ 1, data = china)
+
+#test whether year is a significant predictor
+p <- c(p, anova(china.mod1, china.mod2)[2,8])
+LRT <- c(LRT, anova(china.mod1, china.mod2)[2,7])
+spp <- c(spp, "china")
+
+#check model fit
+hist(residuals(china.mod1))
+plot(residuals(china.mod1))
+resids <- simulateResiduals(china.mod1)
+plot(resids)
+
+#copper
+#filter data
+copper <- RF.long.dat.filt %>%
+  filter(Species %in% "Copper")
+
+#build model with and without predictor
+copper.mod1 <- glm.nb(Count ~ Year, data = copper)
+copper.mod2 <- glm.nb(Count ~ 1, data = copper)
+
+#test whether year is a significant predictor
+p <- c(p, anova(copper.mod1, copper.mod2)[2,8])
+LRT <- c(LRT, anova(copper.mod1, copper.mod2)[2,7])
+spp <- c(spp, "copper")
+
+#check model fit
+hist(residuals(copper.mod1))
+plot(residuals(copper.mod1))
+qqPlot(residuals(copper.mod1))
+resids <- simulateResiduals(copper.mod1)
+plot(resids)
+
+#quillback
+#filter data
+quillback <- RF.long.dat.filt %>%
+  filter(Species %in% "Quillback")
+
+#build model with and without predictor
+quillback.mod1 <- glm.nb(Count ~ Year, data = quillback)
+quillback.mod2 <- glm.nb(Count ~ 1, data = quillback)
+
+#test whether year is a significant predictor
+p <- c(p, anova(quillback.mod1, quillback.mod2)[2,8])
+LRT <- c(LRT, anova(quillback.mod1, quillback.mod2)[2,7])
+spp <- c(spp, "quillback")
+
+#check model fit
+hist(residuals(quillback.mod1))
+plot(residuals(quillback.mod1))
+qqPlot(residuals(quillback.mod1))
+resids <- simulateResiduals(quillback.mod1)
+plot(resids)
+
+#tiger
+#filter data
+tiger <- RF.long.dat.filt %>%
+  filter(Species %in% "Tiger")
+
+#build model with and without predictor
+tiger.mod1 <- glm.nb(Count ~ Year, data = tiger)
+tiger.mod2 <- glm.nb(Count ~ 1, data = tiger)
+
+#test whether year is a significant predictor
+p <- c(p, anova(tiger.mod1, tiger.mod2)[2,8])
+LRT <- c(LRT, anova(tiger.mod1, tiger.mod2)[2,7])
+spp <- c(spp, "tiger")
+
+#check model fit
+hist(residuals(tiger.mod1))
+plot(residuals(tiger.mod1))
+qqPlot(residuals(tiger.mod1))
+resids <- simulateResiduals(tiger.mod1)
+plot(resids)
+
+#yellowtail
+#filter data
+yellowtail <- RF.long.dat.filt %>%
+  filter(Species %in% "Yellowtail")
+
+#build model with and without predictor
+yellowtail.mod1 <- glm.nb(Count ~ Year, data = yellowtail)
+yellowtail.mod2 <- glm.nb(Count ~ 1, data = yellowtail)
+
+#test whether year is a significant predictor
+p <- c(p, anova(yellowtail.mod1, yellowtail.mod2)[2,8])
+LRT <- c(LRT, anova(yellowtail.mod1, yellowtail.mod2)[2,7])
+spp <- c(spp, "yellowtail")
+
+#check model fit
+hist(residuals(yellowtail.mod1))
+plot(residuals(yellowtail.mod1))
+qqPlot(residuals(yellowtail.mod1))
+resids <- simulateResiduals(yellowtail.mod1)
+plot(resids)
+
+#create predicted value using the mixed effects model
 count_pred <- as.data.frame(ggpredict(mod1, terms = c("Year", "Species"), interval = "confidence"))
 colnames(count_pred)[6] <- "Species"
+
+#p values to add to graphs
+LRT <- round(LRT, 2)
+p.vals <- as.data.frame(cbind(spp, p, LRT))
+p.vals$p <- c("p = 0.02", "p = 0.01", "p < 0.001", "p < 0.01", "p < 0.001", "p = 0.02", "p = 0.02")
+p.vals$LRT <- paste("LRT = ", p.vals$LRT)
 
 #plot data, prediction line, and confidence interval 
 fig3_base <- ggplot(count_pred, aes(x = x, y = predicted)) +
@@ -180,6 +332,7 @@ fig3_base <- ggplot(count_pred, aes(x = x, y = predicted)) +
   xlab("Year") +
   ylab("Count") +
   scale_x_continuous(limits = c(2005, 2024)) 
+
 
 #center the plot on the bottom row
 design <- c(
