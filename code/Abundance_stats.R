@@ -339,10 +339,10 @@ fig3_base <- ggplot(count_pred, aes(x = x, y = predicted)) +
   scale_x_continuous(limits = c(2005, 2024)) +
   geom_text(data = p.vals, (aes(x = x, -Inf, label = p)),
             col = "black",
-            vjust = -7.75) +
+            vjust = -14) +
   geom_text(data = p.vals, (aes(x = x, -Inf, label = LRT)),
             col = "black",
-            vjust = -6.5) +
+            vjust = -12) +
   facet_wrap(~Species, scales = "free", ncol = 2) 
 
 #center the plot on the bottom row
@@ -357,7 +357,7 @@ design <- c(
 
 fig3_base + facet_manual(~Species, design = design, scales = "free")
 
-ggsave("Figure_3_With_Model_predictions.png", plot = last_plot(), 
+ggsave("Figure_3_With_Model_predictions.png", plot = last_plot(), width = 8, height = 10, 
        path = here("./figures"))
 
 ################################################################################

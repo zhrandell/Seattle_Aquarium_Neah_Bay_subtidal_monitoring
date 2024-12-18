@@ -56,7 +56,7 @@ marine.dat <- marine.dat %>%
 marine.dat <- marine.dat %>% 
   filter(Direction == "Forward") %>%
   filter(SEAQ_Transect %in% c("T1") ) %>%
-  select(-c(SEAQ_Site, Count)) %>%
+  dplyr::select(-c(SEAQ_Site, Count)) %>%
   unique()
 
 #combine databases to yield year, species, SEAQ_count, RecFIN_count as columns
@@ -68,7 +68,7 @@ dat["RecFin_Count"][is.na(dat["RecFin_Count"])] <- 0 #Add zero count where NAs f
 
 #select desired columms
 dat <- dat %>%
-  select(Year, Location, Species, RecFin_Count, SEAQ_Count)
+  dplyr::select(Year, Location, Species, RecFin_Count, SEAQ_Count)
 
 #plotting (500x400)
 
@@ -92,19 +92,17 @@ datv2 <- datv2 %>%
 dat1 <- datv2 %>%
   filter(Year <= 2009 & !(Species %in% c("canary rockfish", "yelloweye rockfish")))
 dat2 <- datv2 %>%
-  filter(Year >= 2010 & Year <= 2019 & Species == "black rockfish")
+  filter(Year >= 2010 & Year <= 2019 & Species %in% c("black rockfish", "cabezon", "greenling", "halibut", "lingcod", "wolfeel"))
 dat3 <- datv2 %>%
-  filter(Year >= 2020 & Species %in% c("black rockfish", "yellowtail rockfish", "widow rockfish"))
+  filter(Year >= 2020 & Species %in% c("black rockfish", "yellowtail rockfish", "widow rockfish", "cabezon", "greenling", "halibut", "lingcod", "wolfeel"))
 
 datv2 <- rbind(dat1, dat2, dat3)
-datv2 <- datv2 %>%
-  filter(SEAQ_Transect == "T1")
 
 #generalized linear mixed effects model with rec fin count as response, sea aquarium counts as predictor, and bag limit and year as random effects
 #negative binomial - for count data that is over dispersed (variance > mean)
-mod1 <- glmmTMB(log(RecFin_Count + 1) ~ SEAQ_Count + (1|bag_lim) + (1|Year), data = datv2)
+mod1 <- glmmTMB(RecFin_Count ~ SEAQ_Count + (1|bag_lim) + (1|Year), data = datv2)
 summary(mod1)
-mod2 <- glmmTMB(log(RecFin_Count + 1) ~ 1 + (1|bag_lim) + (1|Year), data = datv2)
+mod2 <- glmmTMB(RecFin_Count ~ 1 + (1|bag_lim) + (1|Year), data = datv2)
 summary(mod2)
 anova(mod1, mod2)
 
@@ -112,7 +110,6 @@ anova(mod1, mod2)
 hist(residuals(mod1))
 plot(residuals(mod1))
 qqPlot(residuals(mod1))
-
 
 #create predicted value using the model
 count_pred <- as.data.frame(ggpredict(mod1, terms = c("SEAQ_Count"), interval = "confidence"))
@@ -124,10 +121,10 @@ ggplot(count_pred, aes(x = x, y = predicted)) +
   geom_ribbon(data = count_pred, aes(x = x, ymin = conf.low, ymax = conf.high), alpha = 0.3, fill = "blue") +# add CI
   theme_few() +
   xlab("Dive survey counts") + ylab("RecFIN counts") +
-  annotate("text", x=250, y=30000, label="LRT = 36.78", size = 6)+
-  annotate("text", x=250, y=28000, label="p < 0.001", size = 6) +
-  scale_x_continuous(expand = c(0,0)) +
-  scale_y_continuous(expand = c(0,0))
+  annotate("text", x=250, y=1400, label="LRT = 88.71", size = 6)+
+  annotate("text", x=250, y=1300, label="p < 0.001", size = 6) +
+  scale_x_continuous(limits = c(0, 1250),expand = c(0,0)) +
+  scale_y_continuous(limits = c(0, 1500), expand = c(0,0))
 
 ggsave("Figure_7_with_model_predictions.png", plot = last_plot(),
        path = here("./figures"))
