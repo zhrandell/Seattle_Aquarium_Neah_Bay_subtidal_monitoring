@@ -119,7 +119,7 @@ ggplot(count_pred, aes(x = x, y = predicted)) +
   geom_line(color = "blue", size = 0.8) +  # Line plot of predicted values 
   geom_point(data = datv2, aes(x = SEAQ_Count, y = RecFin_Count), size = 2)  + # add data points
   geom_ribbon(data = count_pred, aes(x = x, ymin = conf.low, ymax = conf.high), alpha = 0.3, fill = "blue") +# add CI
-  theme_few() +
+  theme_cowplot() +
   xlab("Dive survey counts") + ylab("RecFIN counts") +
   annotate("text", x=250, y=1400, label="LRT = 88.71", size = 6)+
   annotate("text", x=250, y=1300, label="p < 0.001", size = 6) +
@@ -127,7 +127,7 @@ ggplot(count_pred, aes(x = x, y = predicted)) +
   scale_y_continuous(limits = c(0, 1500), expand = c(0,0))
 
 ggsave("Figure_7_with_model_predictions.png", plot = last_plot(),
-       path = here("./figures"))
+       path = here("./figures"), bg = "white", dpi = 600)
 
 time.dat <- dat %>%
   pivot_longer("RecFin_Count":"SEAQ_Count", names_to = "Method", values_to = "Count")

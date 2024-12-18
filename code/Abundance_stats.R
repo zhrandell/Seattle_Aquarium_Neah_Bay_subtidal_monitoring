@@ -74,14 +74,36 @@ ggplot(data=test, aes(x=Year,y=Total,group=Site, fill=Site)) +
   theme(legend.position="none")
 
 #Figure 2 with trend lines removed (not statistically robust, so potentially misleading in manuscript)
-ggplot(data=test, aes(x=Year,y=Total,group=Site, fill=Site)) +
+fig2_base <- ggplot(data=test, aes(x=Year,y=Total,group=Site, fill=Site)) +
   geom_point(size=2, alpha=0.5, aes(shape=Site)) +
   scale_shape_manual(values=c(21,22,23,24,25))+
   scale_fill_manual(values=c("#E69F00", "#56B4E9","#009E73","#F0E442","#CC79A7"))+
-  facet_wrap(~Site) +
+  facet_wrap(~Site, ) +
   ylab("Total adult fish")+
   theme_cowplot()+
-  theme(legend.position="none")
+  theme(legend.position="none") +
+  theme(strip.text = element_text(hjust = 0))
+
+#center the plot on the bottom row
+design <- c(
+  "
+  AABBCC
+  #DDEE#
+  "
+)
+
+fig2_base + facet_manual(~Site, design = design, scales = "free",
+                         labeller = labeller(Site = 
+                                               c("Site 1" = "(a) Site 1",
+                                                 "Site 2" = "(b) Site 2",
+                                                 "Site 3" = "(c) Site 3",
+                                                 "Site 4" = "(d) Site 4",
+                                                 "Site 5" = "(e) Site 5")))
+
+
+ggsave("Figure_2_no_trendline.png", plot = last_plot(), width = 10, height = 6, 
+       path = here("./figures"), bg = "white", dpi = 600)
+
 
 #Figure 3
 test2 <- test %>%
@@ -343,7 +365,9 @@ fig3_base <- ggplot(count_pred, aes(x = x, y = predicted)) +
   geom_text(data = p.vals, (aes(x = x, -Inf, label = LRT)),
             col = "black",
             vjust = -12) +
-  facet_wrap(~Species, scales = "free", ncol = 2) 
+  facet_wrap(~Species, scales = "free", ncol = 2) +
+  theme(strip.text = element_text(hjust = 0))
+
 
 #center the plot on the bottom row
 design <- c(
@@ -355,10 +379,19 @@ design <- c(
   "
 )
 
-fig3_base + facet_manual(~Species, design = design, scales = "free")
+fig3_base + facet_manual(~Species, design = design, scales = "free",
+                         labeller = labeller(Species = 
+                                               c("Black and Deacon" = "(a) Black and Deacon",
+                                                 "Canary" = "(b) Canary",
+                                                 "China" = "(c) China",
+                                                 "Copper" = "(d) Copper",
+                                                 "Quillback" = "(e) Quillback",
+                                                 "Tiger" = "(f) Tiger",
+                                                 "Yellowtail" = "(g) Yellowtail")))
+
 
 ggsave("Figure_3_With_Model_predictions.png", plot = last_plot(), width = 8, height = 10, 
-       path = here("./figures"))
+       path = here("./figures"), bg = "white", dpi = 600)
 
 ################################################################################
 #CHANGEPOINT ANALYSIS
