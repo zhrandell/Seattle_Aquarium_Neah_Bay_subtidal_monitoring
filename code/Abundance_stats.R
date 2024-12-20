@@ -633,7 +633,7 @@ Ed <-ggplot(data=Fdata, aes(x=Year, y=Count)) +
 #Create multipaneled plot - dimensions 1000x650
 ggarrange(Ad,Bd,Cd,Dd,Ed) #add F if you want to include panel of total adult rockfish
 Fig4_test <- ggarrange(Ad,Bd,Cd,Dd,Ed) #make figure an object
-ggsave("Fig4.tiff", plot=last_plot(), width=12, height=7, bg="white", dpi=600)
+ggsave("Fig4.jpeg", plot=last_plot(), width=10, height=6, bg="white", dpi=600)
 
 graphics.off()
 windows(6,6,record=T)

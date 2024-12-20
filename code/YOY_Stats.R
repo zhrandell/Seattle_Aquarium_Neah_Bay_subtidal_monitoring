@@ -130,7 +130,13 @@ ggplot(dat, aes(x=Year, y=YOY)) +
   ylab("Young-of-the-year count") +
   annotate("segment", x=2005, xend=2023, y=120, yend=120, color="red", linewidth=0.5, linetype="dashed")
 
-ggsave("Fig5.tiff", plot=last_plot(), width=12, height=7, bg="white", dpi=600)
+Fig5_test <- ggplot(dat, aes(x=Year, y=YOY)) +
+  geom_point(size=5,alpha=0.25) +
+  theme_cowplot() +
+  ylab("Young-of-the-year count") +
+  annotate("segment", x=2005, xend=2023, y=120, yend=120, color="red", linewidth=0.5, linetype="dashed")
+
+ggsave("Fig5.jpeg", plot=last_plot(), width=6, height=5, bg="white", dpi=600)
 
 fig.dat <- dat %>%
   select(Year, Total) %>%
