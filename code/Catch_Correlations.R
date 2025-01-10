@@ -126,8 +126,9 @@ ggplot(count_pred, aes(x = x, y = predicted)) +
   scale_x_continuous(limits = c(0, 1250),expand = c(0,0)) +
   scale_y_continuous(limits = c(0, 1500), expand = c(0,0))
 
-ggsave("Figure_7_with_model_predictions.png", plot = last_plot(),
-       path = here("./figures"), bg = "white", dpi = 600)
+ggsave("Figure_7_with_model_predictions.jpg", plot = last_plot(),
+       path = here("./figures"), bg = "white", dpi = 600,
+       width = 8, height = 7)
 
 time.dat <- dat %>%
   pivot_longer("RecFin_Count":"SEAQ_Count", names_to = "Method", values_to = "Count")

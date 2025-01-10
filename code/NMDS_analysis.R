@@ -14,15 +14,15 @@ library(tidyverse)
 library(vegan)
 
 ## set your paths in a project folder 
-input <- "C:/Users/randellz/Dropbox (Seattle Aquarium)/Coastal Complexity & Resilience Team Folder/GitHub/Seattle_Aquarium_Neah_Bay_subtidal_monitoring/data_input"
-output <- "C:/Users/randellz/Dropbox (Seattle Aquarium)/Coastal Complexity & Resilience Team Folder/GitHub/Seattle_Aquarium_Neah_Bay_subtidal_monitoring/data_output"
+input <- "C:/Users/escontreladieguezd/OneDrive - Seattle Aquarium/Documents/Neah Bay rockfish paper/data_input"
+output <- "C:/Users/escontreladieguezd/OneDrive - Seattle Aquarium/Documents/Neah Bay rockfish paper/data_output"
 
 setwd(input)
 dat <- read.csv("Neah_Bay_data.csv", header=TRUE)
 
 #Path must be set by user
-setwd("C:/Users/shelledyk/OneDrive - Seattle Aquarium/Documents/NeahBay/Seattle_Aquarium_Neah_Bay_subtidal_monitoring")
-dat <- read_csv("data_input/Neah_Bay_data.csv")
+# setwd("C:/Users/shelledyk/OneDrive - Seattle Aquarium/Documents/NeahBay/Seattle_Aquarium_Neah_Bay_subtidal_monitoring")
+# dat <- read_csv("data_input/Neah_Bay_data.csv")
 ## END startup ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -139,14 +139,14 @@ ord <- metaMDS(comm = spp, distance="bray", k=2, min = 1000, trymax=2000,
                autotransform = F, wascores = TRUE)
 
 
-## save a new ordination 
-setwd(output)
-#setwd("C:/Users/shelledyk/OneDrive - Seattle Aquarium/Documents/NeahBay/Seattle_Aquarium_Neah_Bay_subtidal_monitoring/data_output")
-save(ord, file = "ord_T1_no_YOY.rda")
-
-
-## work with ordination: stress, NMDS coords 
-load("ord_T1_only.rda")
+# # ## save a new ordination 
+# setwd(output)
+# #setwd("C:/Users/shelledyk/OneDrive - Seattle Aquarium/Documents/NeahBay/Seattle_Aquarium_Neah_Bay_subtidal_monitoring/data_output")
+# save(ord, file = "ord_T1_no_YOY.rda")
+# 
+# 
+# ## work with ordination: stress, NMDS coords 
+# load("ord_T1_only.rda")
 
 
 ## visualize stress, check ordination, xy coordinates 

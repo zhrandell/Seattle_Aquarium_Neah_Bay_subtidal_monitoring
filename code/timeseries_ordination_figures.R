@@ -14,15 +14,16 @@ rm(list = ls())
 library(tidyverse)
 library(changepoint)
 library(zoo)
+library(ggthemes)
 
 
 ## set your paths in a project folder 
-input <- "D:/OneDrive/Active_Projects/Neah_Bay/data_input"
-output <- "D:/OneDrive/Active_Projects/Neah_Bay/data_output"
-code <- "D:/OneDrive/Active_Projects/Neah_Bay/code" 
-fig <- "D:/OneDrive/Active_Projects/Neah_Bay/figures"
+input <- "C:/Users/escontreladieguezd/OneDrive - Seattle Aquarium/Documents/Neah Bay rockfish paper/data_input"
+output <- "C:/Users/escontreladieguezd/OneDrive - Seattle Aquarium/Documents/Neah Bay rockfish paper/data_output"
+code <- "C:/Users/escontreladieguezd/OneDrive - Seattle Aquarium/Documents/Neah Bay rockfish paper/code"
+fig <- "C:/Users/escontreladieguezd/OneDrive - Seattle Aquarium/Documents/Neah Bay rockfish paper/figures"
 
-output <- "C:/Users/randellz/Dropbox (Seattle Aquarium)/Coastal Complexity & Resilience Team Folder/GitHub/Seattle_Aquarium_Neah_Bay_subtidal_monitoring/data_output"
+
 
 setwd(output)
 dat <- read.csv("NMDS_coords.csv")
