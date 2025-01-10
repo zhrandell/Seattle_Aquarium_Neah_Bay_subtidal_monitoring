@@ -14,11 +14,8 @@ library(tidyverse)
 library(vegan)
 
 ## set your paths in a project folder 
-input <- "C:/Users/escontreladieguezd/OneDrive - Seattle Aquarium/Documents/Neah Bay rockfish paper/data_input"
-output <- "C:/Users/escontreladieguezd/OneDrive - Seattle Aquarium/Documents/Neah Bay rockfish paper/data_output"
-
-setwd(input)
-dat <- read.csv("Neah_Bay_data.csv", header=TRUE)
+output <- here("./data_output")
+dat <- read.csv(here("./data_input/Neah_Bay_data.csv"), header=TRUE)
 
 #Path must be set by user
 # setwd("C:/Users/shelledyk/OneDrive - Seattle Aquarium/Documents/NeahBay/Seattle_Aquarium_Neah_Bay_subtidal_monitoring")
