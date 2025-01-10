@@ -404,7 +404,10 @@ ggsave("Figure_3_With_Model_predictions.jpg", plot = last_plot(), width = 8, hei
 
 library(changepoint.np)
 library(changepoint)
+<<<<<<< HEAD
 # library(bcp)
+=======
+>>>>>>> ebc4c380a2b72a1f32abbc0d44afd641ca46b509
 
 ## avg data across sites
 dat.avg <- dat %>%
@@ -635,6 +638,11 @@ Ed <-ggplot(data=Fdata, aes(x=Year, y=Count)) +
 
 #Create multipaneled plot - dimensions 1000x650
 ggarrange(Ad,Bd,Cd,Dd,Ed) #add F if you want to include panel of total adult rockfish
+Fig4_test <- ggarrange(Ad,Bd,Cd,Dd,Ed) #make figure an object
+ggsave("Fig4.jpeg", plot=last_plot(), width=10, height=6, bg="white", dpi=600)
+
+graphics.off()
+windows(6,6,record=T)
 
 #Housekeeping
 rm(A,Adata,B,Bdata,C,Cdata,D,Ddata,E,Edata,F,Fdata)
